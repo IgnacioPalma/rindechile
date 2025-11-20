@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ChileMap } from './ChileMap';
 import { MapLegend } from './MapLegend';
 import { MunicipalityDetail } from './MunicipalityDetail';
+import { MapBreadcrumb } from './MapBreadcrumb';
 import type {
   MapViewState,
   EnrichedRegionData,
@@ -162,33 +163,22 @@ export function MapContainer() {
   return (
     <div className="w-full h-screen flex flex-col bg-gray-50">
       <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center gap-4">
-          {viewState.level === 'region' && (
-            <button
-              onClick={handleBackToCountry}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-4 h-4"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-              </svg>
-              Back to Chile
-            </button>
-          )}
-          <div>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">
               Chile Municipality Overpricing Analysis
             </h1>
-            <p className="text-sm text-gray-600 mt-1">
+          </div>
+          <div className="flex items-center gap-4">
+            <MapBreadcrumb
+              viewState={viewState}
+              onNavigateToCountry={handleBackToCountry}
+            />
+            <div className="h-4 w-px bg-gray-300" />
+            <p className="text-sm text-gray-600">
               {viewState.level === 'country'
                 ? 'Click on a region to view municipalities'
-                : `Viewing ${viewState.selectedRegion?.properties.Region || 'Region'} - Click on a municipality for details`}
+                : 'Click on a municipality for details'}
             </p>
           </div>
         </div>
