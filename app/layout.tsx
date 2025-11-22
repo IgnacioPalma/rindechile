@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Instrument_Sans } from "next/font/google";
-import "./globals.css";
+import "./styles/globals.css";
 
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
