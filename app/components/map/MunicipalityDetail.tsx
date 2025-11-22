@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/app/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/app/components/ui/badge';
 
 interface MunicipalityDetailProps {
   open: boolean;

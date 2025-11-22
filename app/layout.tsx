@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Sans } from "next/font/google";
 import "./styles/globals.css";
+import { Header } from "./components/Header";
 
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
@@ -20,9 +21,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${instrumentSans.variable} antialiased`}
-        style={{ backgroundColor: '#121A1D' }}
+        className={`${instrumentSans.variable} antialiased bg-background text-foreground p-6 tablet:p-8`}
       >
+        <Header />
         {children}
       </body>
     </html>

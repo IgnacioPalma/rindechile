@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { MapContainer } from "./components/map/MapContainer";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/app/components/ui/skeleton";
 
 function MapContainerSuspense() {
   return (

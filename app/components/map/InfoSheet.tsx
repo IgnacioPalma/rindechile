@@ -1,7 +1,7 @@
 'use client';
 
 import { Info } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/app/components/ui/button';
 import {
   Sheet,
   SheetContent,
@@ -9,7 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
+} from '@/app/components/ui/sheet';
 
 export function InfoSheet() {
   return (

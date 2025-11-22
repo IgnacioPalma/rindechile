@@ -1,6 +1,6 @@
 import type { ColorScale } from '@/types/map';
 import * as d3 from 'd3';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/app/components/ui/badge';
 
 interface MapLegendProps {
   colorScale: ColorScale;

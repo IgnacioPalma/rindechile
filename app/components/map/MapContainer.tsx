@@ -7,10 +7,9 @@ import { MapLegend } from './MapLegend';
 import { MunicipalityDetail } from './MunicipalityDetail';
 import { MapBreadcrumb } from './MapBreadcrumb';
 import { InfoSheet } from './InfoSheet';
-import { Logo } from '../Logo';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/app/components/ui/button';
+import { Skeleton } from '@/app/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/app/components/ui/alert';
 import { ArrowLeft, AlertCircle, RefreshCw, Share2, Check, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import type {
   MapViewState,
@@ -314,65 +313,6 @@ export function MapContainer() {
 
   return (
     <div className="w-full h-screen flex flex-col" style={{ backgroundColor: '#121A1D' }}>
-      {/* Header */}
-      <header className="px-8 py-6" style={{ backgroundColor: '#121A1D' }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Logo />
-            <h1 className="text-xl font-semibold text-white">
-              Sobreprecios en Chile
-            </h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <InfoSheet />
-            {viewState.level === 'region' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleShare}
-                className="text-white hover:text-white hover:bg-white/10"
-                aria-label="Compartir vista actual"
-              >
-                {shareButtonText === 'share' ? (
-                  <>
-                    <Share2 className="h-4 w-4 mr-2" />
-                    Compartir
-                  </>
-                ) : (
-                  <>
-                    <Check className="h-4 w-4 mr-2" />
-                    Copiado
-                  </>
-                )}
-              </Button>
-            )}
-            <div className="text-white font-light">
-              Transparenta 2025
-            </div>
-          </div>
-        </div>
-        
-        {/* Breadcrumb Navigation */}
-        {viewState.level !== 'country' && (
-          <div className="mt-4 flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleBackToCountry}
-              className="text-white hover:text-white hover:bg-white/10"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver a Chile
-            </Button>
-            <div className="text-white/60">
-              <MapBreadcrumb
-                viewState={viewState}
-                onNavigateToCountry={handleBackToCountry}
-              />
-            </div>
-          </div>
-        )}
-      </header>
 
       {/* Main Title */}
       <div className="px-8 py-4 text-center">
