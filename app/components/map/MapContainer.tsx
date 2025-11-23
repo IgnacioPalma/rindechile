@@ -42,8 +42,6 @@ export function MapContainer() {
   const {
     viewState,
     selectedMunicipalityData,
-    dialogOpen,
-    setDialogOpen,
     handleRegionClick,
     handleMunicipalityClick,
     handleBackToCountry,
