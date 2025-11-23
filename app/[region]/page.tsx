@@ -1,7 +1,10 @@
+'use client';
+
 import { redirect } from 'next/navigation';
-import { Metadata } from 'next';
-import { getCodeFromSlug, getRegionNameFromCode, REGION_SLUGS } from '@/lib/region-slugs';
-import MapContainerSuspense from '../components/map/MapContainerSuspense';
+import { getCodeFromSlug } from '@/lib/region-slugs';
+import { MapProvider } from '../contexts/MapContext';
+import { ClientPageContent } from '../components/ClientPageContent';
+import { useEffect, useState } from 'react';
 
 interface RegionPageProps {
   params: Promise<{
@@ -9,43 +12,30 @@ interface RegionPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: RegionPageProps): Promise<Metadata> {
-  const { region: slug } = await params;
-  const regionCode = getCodeFromSlug(slug);
-  
-  if (!regionCode) {
-    return {
-      title: 'Región no encontrada - Transparenta',
-      description: 'La región solicitada no existe.',
-    };
-  }
-  
-  const regionName = getRegionNameFromCode(regionCode);
-  
-  return {
-    title: `${regionName} - Transparenta`,
-    description: `Explora datos de transparencia y sobreprecios en compras públicas para ${regionName}.`,
-  };
-}
+export default function RegionPage({ params }: RegionPageProps) {
+  const [regionCode, setRegionCode] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-export async function generateStaticParams() {
-  return REGION_SLUGS.map((region) => ({
-    region: region.slug,
-  }));
-}
+  useEffect(() => {
+    params.then(({ region: slug }) => {
+      const code = getCodeFromSlug(slug);
+      
+      if (!code) {
+        redirect('/');
+      } else {
+        setRegionCode(code);
+        setIsLoading(false);
+      }
+    });
+  }, [params]);
 
-export default async function RegionPage({ params }: RegionPageProps) {
-  const { region: slug } = await params;
-  const regionCode = getCodeFromSlug(slug);
-  
-  // Redirect to home if invalid slug
-  if (!regionCode) {
-    redirect('/');
+  if (isLoading) {
+    return null;
   }
-  
+
   return (
-    <main className="w-full h-screen">
-      <MapContainerSuspense initialRegionCode={regionCode} />
-    </main>
+    <MapProvider initialRegionCode={regionCode || undefined}>
+      <ClientPageContent />
+    </MapProvider>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import type { MunicipalityData } from '@/types/map';
+import type { DetailPanelData } from '@/app/contexts/MapContext';
 import {
   Table,
   TableBody,
@@ -10,11 +10,10 @@ import {
   TableRow,
 } from '@/app/components/ui/table';
 import { Badge } from '@/app/components/ui/badge';
+import { Card } from '@/app/components/ui/card';
 
-interface MunicipalityPanelProps {
-  municipalityName: string | null;
-  regionName: string | null;
-  data: MunicipalityData | null;
+interface DetailPanelProps {
+  data: DetailPanelData;
 }
 
 // Helper function to get severity level and badge variant
@@ -32,15 +31,11 @@ function getSeverityInfo(percentage: number): {
   }
 }
 
-export function MunicipalityPanel({
-  municipalityName,
-  regionName,
-  data,
-}: MunicipalityPanelProps) {
-  // Empty state when no municipality is selected
-  if (!municipalityName) {
+export function DetailPanel({ data }: DetailPanelProps) {
+  // Empty state when no data
+  if (!data) {
     return (
-      <div className="h-full flex items-center justify-center rounded-lg border border-border">
+      <div className="h-full flex items-center justify-center rounded-lg border border-border bg-card">
         <div className="text-center px-6 py-12">
           <svg
             className="mx-auto h-12 w-12 text-gray-400 mb-4"
@@ -57,26 +52,11 @@ export function MunicipalityPanel({
             />
           </svg>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Click a municipality to explore
+            Select a region or municipality
           </h3>
           <p className="text-sm text-gray-500">
-            Select a municipality on the map to view detailed overpricing data
+            Click on the map to view detailed overpricing data
           </p>
-        </div>
-      </div>
-    );
-  }
-
-  // No data available for selected municipality
-  if (!data) {
-    return (
-      <div className="h-full overflow-y-auto bg-white rounded-lg border border-gray-200 p-6">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900">{municipalityName}</h2>
-          <p className="text-sm text-gray-600 mt-1">{regionName}</p>
-        </div>
-        <div className="py-12 text-center text-gray-500">
-          No overpricing data available for this municipality.
         </div>
       </div>
     );
@@ -90,16 +70,37 @@ export function MunicipalityPanel({
     return `${num.toFixed(2)}%`;
   };
 
-  const severityInfo = getSeverityInfo(data.porcentaje_sobreprecio);
+  const severityInfo = getSeverityInfo(data.data.porcentaje_sobreprecio);
+
+  // Get title and subtitle based on level
+  const getTitle = () => {
+    if (data.level === 'country') {
+      return data.name;
+    }
+    if (data.level === 'region') {
+      return data.name;
+    }
+    return data.name; // municipality
+  };
+
+  const getSubtitle = () => {
+    if (data.level === 'country') {
+      return 'Vista Nacional';
+    }
+    if (data.level === 'region') {
+      return 'Vista Regional';
+    }
+    return data.regionName; // municipality shows region name
+  };
 
   return (
-    <div className="h-full overflow-y-auto rounded-lg border border-border p-6">
+    <div className="h-full overflow-y-auto rounded-sm bg-card p-8">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1">
-            <h2 className="text-2xl font-semibold">{municipalityName}</h2>
-            <p className="text-sm text-gray-600 mt-1">{regionName}</p>
+            <h2 className="text-2xl font-semibold">{getTitle()}</h2>
+            <p className="text-sm text-muted-foreground mt-1">{getSubtitle()}</p>
           </div>
           <Badge variant={severityInfo.variant} className="text-sm ml-4 shrink-0">
             {severityInfo.level}
@@ -110,15 +111,40 @@ export function MunicipalityPanel({
       {/* Summary Card */}
       <div className="rounded-lg p-6 border border-border mb-6">
         <div className="text-center">
-          <p className="text-sm mb-2">Overpricing Percentage</p>
+          <p className="text-sm text-muted-foreground mb-2">Overpricing Percentage</p>
           <p className="text-4xl font-bold">
-            {formatPercentage(data.porcentaje_sobreprecio)}
+            {formatPercentage(data.data.porcentaje_sobreprecio)}
+          </p>
+        </div>
+      </div>
+
+      {/* D3 Chart Placeholder */}
+      <div className="rounded-lg border border-border p-6 mb-6 bg-muted/20">
+        <div className="text-center py-12">
+          <svg
+            className="mx-auto h-16 w-16 text-muted-foreground mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+          <p className="text-sm text-muted-foreground">
+            D3 Chart Placeholder
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Visualizations coming soon
           </p>
         </div>
       </div>
 
       {/* Detailed Table */}
-      <div className="rounded-lg border border-gray-200 mb-6">
+      <div className="rounded-lg border border-border mb-6">
         <Table>
           <TableHeader>
             <TableRow>
@@ -130,25 +156,25 @@ export function MunicipalityPanel({
             <TableRow>
               <TableCell className="font-medium">Overpriced Purchases</TableCell>
               <TableCell className="text-right font-mono">
-                {formatNumber(data.compras_caras)}
+                {formatNumber(data.data.compras_caras)}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-medium">Total Purchases</TableCell>
               <TableCell className="text-right font-mono">
-                {formatNumber(data.compras_totales)}
+                {formatNumber(data.data.compras_totales)}
               </TableCell>
             </TableRow>
-            <TableRow className="">
+            <TableRow>
               <TableCell className="font-medium">Overpricing Rate</TableCell>
               <TableCell className="text-right font-mono font-semibold">
-                {formatPercentage(data.porcentaje_sobreprecio)}
+                {formatPercentage(data.data.porcentaje_sobreprecio)}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-medium">Ratio</TableCell>
-              <TableCell className="text-right font-mono text-sm text-gray-600">
-                {data.compras_caras} / {data.compras_totales}
+              <TableCell className="text-right font-mono text-sm text-muted-foreground">
+                {data.data.compras_caras} / {data.data.compras_totales}
               </TableCell>
             </TableRow>
           </TableBody>
@@ -156,7 +182,7 @@ export function MunicipalityPanel({
       </div>
 
       {/* Footer Note */}
-      <p className="text-xs text-gray-500 text-center">
+      <p className="text-xs text-muted-foreground text-center">
         Data represents the percentage of purchases with overpricing issues
       </p>
     </div>

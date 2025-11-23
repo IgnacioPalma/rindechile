@@ -31,7 +31,7 @@ export function ChileMap({
 }: ChileMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const [dimensions, setDimensions] = useState({ width: 600, height: 600 });
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const [viewportSize, setViewportSize] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
 
@@ -74,7 +74,7 @@ export function ChileMap({
     
     if (viewState.level === 'region' && viewState.selectedRegion && municipalitiesData.length > 0) {
       // Use D3's fitExtent to automatically calculate correct projection parameters
-      const padding = 20;
+      const padding = 100;
       return baseProjection
         .rotate([0, 0, 0]) // Reset rotation for region view
         .fitExtent(
@@ -94,7 +94,7 @@ export function ChileMap({
       scale = 750;
       rotate = [71, 37, 0];
     } else {
-      scale = 850;
+      scale = 800;
       rotate = [71, 37, 0];
     }
     
@@ -166,7 +166,7 @@ export function ChileMap({
   }, []);
 
   return (
-    <div ref={containerRef} className="relative rounded-sm bg-card">
+    <div ref={containerRef} className="relative">
       <svg
         ref={svgRef}
         width={dimensions.width}
@@ -181,7 +181,7 @@ export function ChileMap({
                 d={pathGenerator(region.feature) || ''}
                 fill={getColor(region.averageOverpricing)}
                 stroke="#101010"
-                strokeWidth={1.1}
+                strokeWidth={0.9}
                 className="cursor-pointer transition-opacity hover:opacity-80"
                 onClick={() => handleRegionClick(region.feature.properties.codregion.toString())}
                 onMouseEnter={(e) =>

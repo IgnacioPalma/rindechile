@@ -11,7 +11,7 @@ import {
 export function Header() {
     return (
         <header className="flex flex-row justify-between items-center">
-            <div className="flex flex-row gap-3">
+            <Link href="/" className="flex flex-row gap-3">
                 <Image
                     src="/logo.svg"
                     alt="Transparenta Logo"
@@ -20,7 +20,7 @@ export function Header() {
                     className="fill-foreground"
                 />
                 <h1 className="text-xl font-semibold">Vigil Chile</h1>
-            </div>
+            </Link>
 
             <NavigationMenu>
                 <NavigationMenuItem>

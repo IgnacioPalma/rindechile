@@ -1,3 +1,5 @@
+'use client';
+
 import { Suspense } from "react";
 import { MapContainer } from "./MapContainer";
 import { Skeleton } from "@/app/components/ui/skeleton";
@@ -28,10 +30,10 @@ function MapLoadingFallback() {
   );
 }
 
-export default function MapContainerSuspense({ initialRegionCode }: MapContainerSuspenseProps) {
+export default function MapContainerSuspense() {
   return (
     <Suspense fallback={<MapLoadingFallback />}>
-      <MapContainer initialRegionCode={initialRegionCode} />
+      <MapContainer />
     </Suspense>
   );
 }

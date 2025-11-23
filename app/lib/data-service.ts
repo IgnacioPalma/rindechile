@@ -5,6 +5,7 @@ import type {
   EnrichedRegionData,
   EnrichedMunicipalityData,
   RegionDataMap,
+  RegionData,
 } from '@/types/map';
 
 import { findRegionDataKey } from './name-normalizer';
@@ -251,6 +252,57 @@ export function getRegionTertileBreakpoints(): number[] {
  */
 export function getOverpricingRange(): [number, number] {
   return getMunicipalityOverpricingRange();
+}
+
+/**
+ * Aggregates country-level data from all regions
+ */
+export function getCountryData(): {
+  porcentaje_sobreprecio: number;
+  compras_caras: number;
+  compras_totales: number;
+} {
+  const data = getRegionData();
+  const regions = Object.values(data);
+  
+  if (regions.length === 0) {
+    return {
+      porcentaje_sobreprecio: 0,
+      compras_caras: 0,
+      compras_totales: 0,
+    };
+  }
+  
+  const totalComprasCaras = regions.reduce((sum, r) => sum + r.compras_caras, 0);
+  const totalComprasTotales = regions.reduce((sum, r) => sum + r.compras_totales, 0);
+  const avgOverpricing = regions.reduce((sum, r) => sum + r.porcentaje_sobreprecio, 0) / regions.length;
+  
+  return {
+    porcentaje_sobreprecio: avgOverpricing,
+    compras_caras: totalComprasCaras,
+    compras_totales: totalComprasTotales,
+  };
+}
+
+/**
+ * Gets aggregated data for a specific region by region code
+ */
+export function getRegionDataByCode(regionCode: number): RegionData | null {
+  const data = getRegionData();
+  const regionName = Object.keys(REGION_ID_MAP).find(name => REGION_ID_MAP[name] === regionCode);
+  
+  if (!regionName) {
+    return null;
+  }
+  
+  const dataKeys = Object.keys(data);
+  const regionKey = findRegionDataKey(regionName, dataKeys);
+  
+  if (!regionKey) {
+    return null;
+  }
+  
+  return data[regionKey] || null;
 }
 
 /**
