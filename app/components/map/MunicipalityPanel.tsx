@@ -40,7 +40,7 @@ export function MunicipalityPanel({
   // Empty state when no municipality is selected
   if (!municipalityName) {
     return (
-      <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200">
+      <div className="h-full flex items-center justify-center rounded-lg border border-border">
         <div className="text-center px-6 py-12">
           <svg
             className="mx-auto h-12 w-12 text-gray-400 mb-4"
@@ -93,12 +93,12 @@ export function MunicipalityPanel({
   const severityInfo = getSeverityInfo(data.porcentaje_sobreprecio);
 
   return (
-    <div className="h-full overflow-y-auto bg-white rounded-lg border border-gray-200 p-6">
+    <div className="h-full overflow-y-auto rounded-lg border border-border p-6">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1">
-            <h2 className="text-2xl font-semibold text-gray-900">{municipalityName}</h2>
+            <h2 className="text-2xl font-semibold">{municipalityName}</h2>
             <p className="text-sm text-gray-600 mt-1">{regionName}</p>
           </div>
           <Badge variant={severityInfo.variant} className="text-sm ml-4 shrink-0">
@@ -108,10 +108,10 @@ export function MunicipalityPanel({
       </div>
 
       {/* Summary Card */}
-      <div className="bg-gradient-to-r from-pink-50 to-cyan-50 rounded-lg p-6 border border-gray-200 mb-6">
+      <div className="rounded-lg p-6 border border-border mb-6">
         <div className="text-center">
-          <p className="text-sm text-gray-600 mb-2">Overpricing Percentage</p>
-          <p className="text-4xl font-bold bg-gradient-to-r from-[#ED2472] to-[#68CCDB] bg-clip-text text-transparent">
+          <p className="text-sm mb-2">Overpricing Percentage</p>
+          <p className="text-4xl font-bold">
             {formatPercentage(data.porcentaje_sobreprecio)}
           </p>
         </div>
@@ -139,7 +139,7 @@ export function MunicipalityPanel({
                 {formatNumber(data.compras_totales)}
               </TableCell>
             </TableRow>
-            <TableRow className="bg-gray-50">
+            <TableRow className="">
               <TableCell className="font-medium">Overpricing Rate</TableCell>
               <TableCell className="text-right font-mono font-semibold">
                 {formatPercentage(data.porcentaje_sobreprecio)}
