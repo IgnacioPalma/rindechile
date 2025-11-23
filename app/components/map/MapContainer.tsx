@@ -1,22 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { ChileMap } from './ChileMap';
 import { MapLegend } from './MapLegend';
 import { MunicipalityDetail } from './MunicipalityDetail';
-import { MapBreadcrumb } from './MapBreadcrumb';
-import { InfoSheet } from './InfoSheet';
+import { MapLoadingState } from './MapLoadingState';
+import { MapErrorState } from './MapErrorState';
 import { Button } from '@/app/components/ui/button';
-import { Skeleton } from '@/app/components/ui/skeleton';
-import { Alert, AlertDescription, AlertTitle } from '@/app/components/ui/alert';
-import { ArrowLeft, AlertCircle, RefreshCw, Share2, Check, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+
 import type {
-  MapViewState,
   EnrichedRegionData,
   EnrichedMunicipalityData,
   ColorScale,
-  MunicipalityData,
 } from '@/types/map';
 import {
   loadRegionsGeoJSON,
@@ -26,30 +22,35 @@ import {
   loadMunicipalitiesGeoJSON,
   enrichMunicipalityData,
 } from '@/app/lib/data-service';
+import { useAriaLive } from './hooks/useAriaLive';
+import { useMapNavigation } from './hooks/useMapNavigation';
 
 export function MapContainer() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  
   const [regionsData, setRegionsData] = useState<EnrichedRegionData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewState, setViewState] = useState<MapViewState>({
-    level: 'country',
-    selectedRegion: null,
-    selectedMunicipality: null,
-  });
-  const [selectedMunicipalityData, setSelectedMunicipalityData] = useState<{
-    name: string;
-    regionName: string;
-    data: MunicipalityData | null;
-  } | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [municipalitiesData, setMunicipalitiesData] = useState<EnrichedMunicipalityData[]>([]);
   const [loadingMunicipalities, setLoadingMunicipalities] = useState(false);
   const [nationalAverage, setNationalAverage] = useState<number | undefined>(undefined);
   const [shareButtonText, setShareButtonText] = useState<'share' | 'copied'>('share');
-  const [ariaLiveMessage, setAriaLiveMessage] = useState<string>('');
+
+  // Accessibility announcements
+  const { message: ariaLiveMessage, announce } = useAriaLive();
+
+  // Navigation state and handlers
+  const {
+    viewState,
+    selectedMunicipalityData,
+    dialogOpen,
+    setDialogOpen,
+    handleRegionClick,
+    handleMunicipalityClick,
+    handleBackToCountry,
+  } = useMapNavigation({
+    regionsData,
+    municipalitiesData,
+    onAnnounce: announce,
+  });
 
   // Initialize color scale
   const [colorScale, setColorScale] = useState<ColorScale>({
@@ -76,14 +77,15 @@ export function MapContainer() {
         const range = getRegionOverpricingRange();
 
         // Calculate national average
-        const totalOverpricing = enriched.reduce((sum, region) => 
-          sum + region.averageOverpricing, 0
+        const totalOverpricing = enriched.reduce(
+          (sum, region) => sum + region.averageOverpricing,
+          0
         );
         const average = enriched.length > 0 ? totalOverpricing / enriched.length : undefined;
         setNationalAverage(average);
 
         setRegionsData(enriched);
-        setColorScale(prev => ({
+        setColorScale((prev) => ({
           ...prev,
           domain: range,
         }));
@@ -97,24 +99,6 @@ export function MapContainer() {
 
     loadData();
   }, []);
-
-  // Initialize view from URL params
-  useEffect(() => {
-    const regionParam = searchParams.get('region');
-    if (regionParam && regionsData.length > 0) {
-      const region = regionsData.find(
-        r => r.feature.properties.codregion.toString() === regionParam
-      );
-      
-      if (region && viewState.level === 'country') {
-        setViewState({
-          level: 'region',
-          selectedRegion: region.feature,
-          selectedMunicipality: null,
-        });
-      }
-    }
-  }, [searchParams, regionsData]);
 
   // Load municipalities when region is selected
   useEffect(() => {
@@ -146,76 +130,19 @@ export function MapContainer() {
     if (viewState.level === 'country') {
       // Use region range for country view
       const range = getRegionOverpricingRange();
-      setColorScale(prev => ({
+      setColorScale((prev) => ({
         ...prev,
         domain: range,
       }));
     } else if (viewState.level === 'region') {
       // Use municipality range for region view
       const range = getMunicipalityOverpricingRange();
-      setColorScale(prev => ({
+      setColorScale((prev) => ({
         ...prev,
         domain: range,
       }));
     }
   }, [viewState.level]);
-
-  // Handle region click
-  const handleRegionClick = (regionCode: string) => {
-    const region = regionsData.find(
-      r => r.feature.properties.codregion.toString() === regionCode
-    );
-
-    if (region) {
-      setViewState({
-        level: 'region',
-        selectedRegion: region.feature,
-        selectedMunicipality: null,
-      });
-      
-      // Update URL
-      const params = new URLSearchParams();
-      params.set('region', regionCode);
-      router.push(`?${params.toString()}`, { scroll: false });
-      
-      // Announce to screen readers
-      setAriaLiveMessage(`Mostrando región ${region.feature.properties.Region}`);
-    }
-  };
-
-  // Handle municipality click
-  const handleMunicipalityClick = (municipalityCode: string) => {
-    const municipality = municipalitiesData.find(
-      m => m.feature.properties.cod_comuna.toString() === municipalityCode
-    );
-
-    if (municipality) {
-      setSelectedMunicipalityData({
-        name: municipality.feature.properties.Comuna,
-        regionName: viewState.selectedRegion?.properties.Region || '',
-        data: municipality.data,
-      });
-      setDialogOpen(true);
-      
-      // Announce to screen readers
-      setAriaLiveMessage(`Mostrando detalles de ${municipality.feature.properties.Comuna}`);
-    }
-  };
-
-  // Handle back navigation
-  const handleBackToCountry = () => {
-    setViewState({
-      level: 'country',
-      selectedRegion: null,
-      selectedMunicipality: null,
-    });
-    
-    // Clear URL params
-    router.push('/', { scroll: false });
-    
-    // Announce to screen readers
-    setAriaLiveMessage('Mostrando vista de Chile completo');
-  };
 
   // Handle retry for errors
   const handleRetry = () => {
@@ -249,71 +176,18 @@ export function MapContainer() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [viewState.level, dialogOpen]);
+  }, [viewState.level, dialogOpen, handleBackToCountry, setDialogOpen]);
 
   if (loading) {
-    return (
-      <div className="w-full h-screen flex flex-col" >
-        {/* Header Skeleton */}
-        <header className="px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-10 w-10 rounded-full bg-white/10" />
-              <Skeleton className="h-6 w-48 bg-white/10" />
-            </div>
-            <Skeleton className="h-9 w-32 bg-white/10" />
-          </div>
-        </header>
-
-        {/* Title Skeleton */}
-        <div className="px-8 py-4 text-center">
-          <Skeleton className="h-8 w-96 mx-auto bg-white/10" />
-        </div>
-
-        {/* Map Loading State */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-white/20 border-t-white" />
-            <p className="text-white/80">Cargando datos del mapa...</p>
-            <p className="text-white/50 text-sm">Preparando visualización</p>
-          </div>
-        </div>
-
-        {/* Legend Skeleton */}
-        <div className="px-8 pb-8">
-          <Skeleton className="h-16 w-full bg-white/10" />
-        </div>
-      </div>
-    );
+    return <MapLoadingState />;
   }
 
   if (error) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center p-8" >
-        <div className="max-w-md w-full">
-          <Alert variant="destructive" className="bg-red-900/20 border-red-500/50">
-            <AlertCircle className="h-5 w-5" />
-            <AlertTitle className="text-lg font-semibold">Error al cargar datos</AlertTitle>
-            <AlertDescription className="mt-2 space-y-4">
-              <p>{error}</p>
-              <Button
-                onClick={handleRetry}
-                variant="outline"
-                className="w-full bg-white/10 hover:bg-white/20 border-white/20 text-white"
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Reintentar
-              </Button>
-            </AlertDescription>
-          </Alert>
-        </div>
-      </div>
-    );
+    return <MapErrorState error={error} onRetry={handleRetry} />;
   }
 
   return (
-    <div className="w-full h-screen flex flex-col" >
-
+    <div className="w-full h-screen flex flex-col">
       {/* Main Title */}
       <div className="px-8 py-4 text-center">
         <h2 className="text-2xl font-light text-white">
@@ -323,7 +197,7 @@ export function MapContainer() {
 
       {/* Map Container */}
       <div className="flex-1 px-8 pb-2 overflow-hidden relative">
-        <div className="w-full h-full" >
+        <div className="w-full h-full">
           <ChileMap
             regionsData={regionsData}
             municipalitiesData={municipalitiesData}
@@ -334,7 +208,7 @@ export function MapContainer() {
             colorScale={colorScale}
           />
         </div>
-        
+
         {/* Mobile Zoom Controls - Fixed Position */}
         <div className="absolute bottom-4 right-4 flex flex-col gap-2 md:hidden">
           <Button
@@ -391,14 +265,9 @@ export function MapContainer() {
           data={selectedMunicipalityData.data}
         />
       )}
-      
+
       {/* ARIA Live Region for Screen Reader Announcements */}
-      <div
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      >
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
         {ariaLiveMessage}
       </div>
     </div>
