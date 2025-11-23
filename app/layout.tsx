@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { Instrument_Sans } from "next/font/google";
 import "./styles/globals.css";
+
+import { Instrument_Sans } from "next/font/google";
+
 import { Header } from "./components/Header";
 
 const instrumentSans = Instrument_Sans({
@@ -9,8 +11,8 @@ const instrumentSans = Instrument_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Sobreprecios",
-  description: "Análisis de sobreprecios en las compras municipales de Chile.",
+  title: "Vigil Chile - Transparencia en Compras Municipales",
+  description: "Plataforma dedicada a monitorear y promover la transparencia en las compras municipales en Chile, facilitando el acceso a información pública y fomentando la participación ciudadana.",
 };
 
 export default function RootLayout({
