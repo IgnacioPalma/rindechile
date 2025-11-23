@@ -111,32 +111,6 @@ export function ChileMap({
     [colorScale]
   );
 
-  // Setup zoom behavior
-  useEffect(() => {
-    if (!svgRef.current) return;
-
-    const svg = d3.select(svgRef.current);
-    const g = svg.select<SVGGElement>('g.map-container');
-
-    const zoom = d3
-      .zoom<SVGSVGElement, unknown>()
-      .scaleExtent([1, 8])
-      .on('zoom', (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
-        g.attr('transform', event.transform.toString());
-      });
-
-    svg.call(zoom);
-
-    // Reset zoom when view state changes
-    if (viewState.level === 'country') {
-      svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
-    }
-
-    return () => {
-      svg.on('.zoom', null);
-    };
-  }, [viewState.level]);
-
   // Handle region click
   const handleRegionClick = useCallback(
     (regionCode: string) => {
@@ -172,7 +146,7 @@ export function ChileMap({
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-full h-full border border-border rounded-sm">
+    <div ref={containerRef} className="relative w-full h-full rounded-sm">
       <svg
         ref={svgRef}
         width={dimensions.width}

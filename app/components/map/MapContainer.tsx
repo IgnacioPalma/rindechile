@@ -7,7 +7,6 @@ import { MunicipalityDetail } from './MunicipalityDetail';
 import { MapLoadingState } from './MapLoadingState';
 import { MapErrorState } from './MapErrorState';
 import { Button } from '@/app/components/ui/button';
-import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 
 import type {
   EnrichedRegionData,
@@ -252,46 +251,6 @@ export function MapContainer() {
             viewState={viewState}
             colorScale={colorScale}
           />
-        </div>
-
-        {/* Mobile Zoom Controls - Fixed Position */}
-        <div className="absolute bottom-4 right-4 flex flex-col gap-2 md:hidden">
-          <Button
-            size="icon"
-            variant="secondary"
-            className="h-11 w-11 bg-white/90 hover:bg-white shadow-lg"
-            aria-label="Acercar"
-            onClick={() => {
-              // This would need to be connected to ChileMap's zoom functionality
-              // For now, it's a placeholder for the UI
-            }}
-          >
-            <ZoomIn className="h-5 w-5" />
-          </Button>
-          <Button
-            size="icon"
-            variant="secondary"
-            className="h-11 w-11 bg-white/90 hover:bg-white shadow-lg"
-            aria-label="Alejar"
-            onClick={() => {
-              // This would need to be connected to ChileMap's zoom functionality
-              // For now, it's a placeholder for the UI
-            }}
-          >
-            <ZoomOut className="h-5 w-5" />
-          </Button>
-          <Button
-            size="icon"
-            variant="secondary"
-            className="h-11 w-11 bg-white/90 hover:bg-white shadow-lg"
-            aria-label="Restablecer vista"
-            onClick={() => {
-              // This would need to be connected to ChileMap's zoom functionality
-              // For now, it's a placeholder for the UI
-            }}
-          >
-            <Maximize2 className="h-5 w-5" />
-          </Button>
         </div>
       </div>
 
