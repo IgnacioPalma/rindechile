@@ -7,6 +7,7 @@ import {
   NavigationMenuLink,
   navigationMenuTriggerStyle,
 } from "@/app/components/ui/navigation-menu"
+import { Button } from "../ui/button";
 
 export function Header() {
     return (
@@ -22,17 +23,13 @@ export function Header() {
                 <h1 className="text-xl font-semibold">Vigil Chile</h1>
             </Link>
 
-            <NavigationMenu>
-                <NavigationMenuItem>
-                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                        <Link href="/docs">Docs</Link>
-                    </NavigationMenuLink>
-                </NavigationMenuItem>
-            </NavigationMenu>
+            <Button variant="ghost" size="lg">
+                Metodología
+            </Button>
             
-            <h1 className="font-regular text-lg">
-                Transparenta 2025
-            </h1>
+            <Button>
+                Apóyanos con un like
+            </Button>
         </header>
     )
 };

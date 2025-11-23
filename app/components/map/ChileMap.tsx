@@ -6,9 +6,11 @@ import type {
   MapViewState,
   EnrichedRegionData,
   EnrichedMunicipalityData,
-  TooltipData,
   ColorScale,
 } from '@/types/map';
+import { useMapTextures } from './hooks/useMapTextures';
+import { useViewportSize } from './hooks/useViewportSize';
+import { useTooltip } from './hooks/useTooltip';
 
 interface ChileMapProps {
   regionsData: EnrichedRegionData[];
@@ -32,26 +34,11 @@ export function ChileMap({
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 600, height: 600 });
-  const [tooltip, setTooltip] = useState<TooltipData | null>(null);
-  const [viewportSize, setViewportSize] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
-
-  // Detect viewport size: mobile (<768px), tablet (768-1154px), desktop (>=1154px)
-  useEffect(() => {
-    const checkViewportSize = () => {
-      const width = window.innerWidth;
-      if (width < 768) {
-        setViewportSize('mobile');
-      } else if (width < 1154) {
-        setViewportSize('tablet');
-      } else {
-        setViewportSize('desktop');
-      }
-    };
-    
-    checkViewportSize();
-    window.addEventListener('resize', checkViewportSize);
-    return () => window.removeEventListener('resize', checkViewportSize);
-  }, []);
+  
+  // Use custom hooks
+  useMapTextures(svgRef);
+  const viewportSize = useViewportSize();
+  const { tooltip, showTooltip, hideTooltip } = useTooltip();
 
   // Handle responsive sizing
   useEffect(() => {
@@ -111,8 +98,8 @@ export function ChileMap({
     [projection]
   );
 
-  // Color scale function
-  const getColor = useCallback(
+  // Get fill for area (texture URL or color)
+  const getFill = useCallback(
     (overpricing: number | null | undefined): string => {
       if (overpricing === null || overpricing === undefined) {
         return '#E5E7EB'; // Gray for no data
@@ -121,12 +108,13 @@ export function ChileMap({
       // Find the appropriate tier based on threshold
       for (let i = colorScale.breakpoints.length - 1; i >= 0; i--) {
         if (overpricing >= colorScale.breakpoints[i].threshold) {
-          return colorScale.breakpoints[i].color;
+          // Return texture URL if available, otherwise return color
+          return colorScale.breakpoints[i].texture || colorScale.breakpoints[i].color;
         }
       }
       
       // Default to first tier if below all thresholds
-      return colorScale.breakpoints[0]?.color || '#E5E7EB';
+      return colorScale.breakpoints[0]?.texture || colorScale.breakpoints[0]?.color || '#E5E7EB';
     },
     [colorScale]
   );
@@ -151,20 +139,6 @@ export function ChileMap({
     [onMunicipalityClick, viewState.level]
   );
 
-  // Show tooltip
-  const showTooltip = useCallback((data: TooltipData, event: React.MouseEvent) => {
-    setTooltip({
-      ...data,
-      x: event.clientX,
-      y: event.clientY,
-    });
-  }, []);
-
-  // Hide tooltip
-  const hideTooltip = useCallback(() => {
-    setTooltip(null);
-  }, []);
-
   return (
     <div ref={containerRef} className="relative">
       <svg
@@ -179,7 +153,7 @@ export function ChileMap({
               <path
                 key={region.feature.properties.codregion}
                 d={pathGenerator(region.feature) || ''}
-                fill={getColor(region.averageOverpricing)}
+                fill={getFill(region.averageOverpricing)}
                 stroke="#101010"
                 strokeWidth={0.9}
                 className="cursor-pointer transition-opacity hover:opacity-80"
@@ -189,8 +163,6 @@ export function ChileMap({
                     {
                       name: region.feature.properties.Region,
                       overpricing: region.averageOverpricing,
-                      x: 0,
-                      y: 0,
                     },
                     e
                   )
@@ -205,7 +177,7 @@ export function ChileMap({
               <path
                 key={municipality.feature.properties.cod_comuna}
                 d={pathGenerator(municipality.feature) || ''}
-                fill={getColor(municipality.data?.porcentaje_sobreprecio)}
+                fill={getFill(municipality.data?.porcentaje_sobreprecio)}
                 stroke="#101010"
                 strokeWidth={1.1}
                 className="cursor-pointer transition-opacity hover:opacity-80"
@@ -215,8 +187,6 @@ export function ChileMap({
                     {
                       name: municipality.feature.properties.Comuna,
                       overpricing: municipality.data?.porcentaje_sobreprecio || null,
-                      x: 0,
-                      y: 0,
                     },
                     e
                   )

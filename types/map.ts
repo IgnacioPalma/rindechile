@@ -105,6 +105,7 @@ export interface MapViewState {
 export interface ColorBreakpoint {
   threshold: number;
   color: string;
+  texture?: string; // Optional texture URL for pattern fills
   label: string;
 }
 

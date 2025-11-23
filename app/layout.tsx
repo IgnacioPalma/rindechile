@@ -3,7 +3,7 @@ import "./styles/globals.css";
 
 import { Instrument_Sans } from "next/font/google";
 
-import { Header } from "./components/Header";
+import { Header } from "./components/navigation/Header";
 
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",

@@ -1,5 +1,7 @@
 import type { ColorScale } from '@/types/map';
 import { Badge } from '@/app/components/ui/badge';
+import { useRef } from 'react';
+import { useMapTextures } from './hooks/useMapTextures';
 
 interface MapLegendProps {
   colorScale: ColorScale;
@@ -9,16 +11,23 @@ interface MapLegendProps {
 
 export function MapLegend({ colorScale, showStatistics = true, nationalAverage }: MapLegendProps) {
   const { breakpoints } = colorScale;
+  const svgRef = useRef<SVGSVGElement>(null);
+  
+  // Apply textures to the legend SVG
+  useMapTextures(svgRef);
   
   return (
     <div className="w-full space-y-3">
+      {/* Hidden SVG for texture definitions */}
+      <svg ref={svgRef} width="0" height="0" style={{ position: 'absolute' }} />
+      
       {/* Legend Title and Stats */}
       <div className="flex items-center justify-between">
-        <div className="text-white/70 text-xs font-light">
+        <div className="text-xs font-light">
           Porcentaje de compras con sobreprecio
         </div>
         {showStatistics && nationalAverage !== undefined && (
-          <Badge variant="outline" className="bg-white/5 text-white/80 border-white/20">
+          <Badge variant="outline" className="bg-white/5 border-white/20">
             Promedio nacional: {nationalAverage.toFixed(2)}%
           </Badge>
         )}
@@ -31,15 +40,29 @@ export function MapLegend({ colorScale, showStatistics = true, nationalAverage }
           
           return (
             <div key={breakpoint.label} className="flex-1 flex flex-col gap-1">
-              {/* Color box */}
-              <div 
-                className="h-3 rounded-sm"
-                style={{ backgroundColor: breakpoint.color }}
-              />
+              {/* Texture/Color preview */}
+              {breakpoint.texture ? (
+                <svg width="100%" height="20" className="rounded-sm">
+                  <rect 
+                    x="0" 
+                    y="0" 
+                    width="100%" 
+                    height="100%" 
+                    fill={breakpoint.texture} 
+                    stroke="#101010"
+                    strokeWidth="0.5"
+                  />
+                </svg>
+              ) : (
+                <div 
+                  className="h-5 rounded-sm border border-[#101010]"
+                  style={{ backgroundColor: breakpoint.color }}
+                />
+              )}
               {/* Label and range */}
-              <div className="text-white/80 text-xs font-light text-center">
+              <div className="text-xs font-light text-center">
                 <div className="font-medium">{breakpoint.label}</div>
-                <div className="text-white/60">
+                <div className="">
                   {breakpoint.threshold}%-{nextThreshold}%
                 </div>
               </div>

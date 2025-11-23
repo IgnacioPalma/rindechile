@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { ChileMap } from './ChileMap';
 import { MapLegend } from './MapLegend';
 import { MapLoadingState } from './MapLoadingState';
 import { MapErrorState } from './MapErrorState';
 import { useMapContext } from '@/app/contexts/MapContext';
-
-import type { ColorScale } from '@/types/map';
+import { useColorScale } from './hooks/useColorScale';
 import {
   getMunicipalityOverpricingRange,
   getRegionOverpricingRange,
@@ -30,69 +29,14 @@ export function MapContainer() {
     handleRetry,
   } = useMapContext();
 
-  // Initialize color scale
-  const [colorScale, setColorScale] = useState<ColorScale>({
-    domain: [0, 100],
-    breakpoints: [],
+  // Use custom hook for color scale management
+  const colorScale = useColorScale({
+    viewLevel: viewState.level,
+    getRegionRange: getRegionOverpricingRange,
+    getRegionTertiles: getRegionTertileBreakpoints,
+    getMunicipalityRange: getMunicipalityOverpricingRange,
+    getMunicipalityTertiles: getMunicipalityTertileBreakpoints,
   });
-
-  // Initialize breakpoints with CSS variables on mount
-  useEffect(() => {
-    const root = document.documentElement;
-    const computedStyle = getComputedStyle(root);
-    
-    // Get tertile breakpoints from region data (for initial country view)
-    const tertiles = getRegionTertileBreakpoints();
-    
-    const breakpoints = [
-      { threshold: tertiles[0], color: computedStyle.getPropertyValue('--tier-bajo').trim(), label: 'Bajo' },
-      { threshold: tertiles[1], color: computedStyle.getPropertyValue('--tier-medio').trim(), label: 'Medio' },
-      { threshold: tertiles[2], color: computedStyle.getPropertyValue('--tier-alto').trim(), label: 'Alto' },
-    ];
-    
-    setColorScale((prev) => ({
-      ...prev,
-      breakpoints,
-    }));
-  }, []);
-
-  // Update color scale range based on view level
-  useEffect(() => {
-    const root = document.documentElement;
-    const computedStyle = getComputedStyle(root);
-    
-    if (viewState.level === 'country') {
-      // Use region range and tertiles for country view
-      const range = getRegionOverpricingRange();
-      const tertiles = getRegionTertileBreakpoints();
-      
-      const breakpoints = [
-        { threshold: tertiles[0], color: computedStyle.getPropertyValue('--tier-bajo').trim(), label: 'Bajo' },
-        { threshold: tertiles[1], color: computedStyle.getPropertyValue('--tier-medio').trim(), label: 'Medio' },
-        { threshold: tertiles[2], color: computedStyle.getPropertyValue('--tier-alto').trim(), label: 'Alto' },
-      ];
-      
-      setColorScale({
-        domain: range,
-        breakpoints,
-      });
-    } else if (viewState.level === 'region') {
-      // Use municipality range and tertiles for region view
-      const range = getMunicipalityOverpricingRange();
-      const tertiles = getMunicipalityTertileBreakpoints();
-      
-      const breakpoints = [
-        { threshold: tertiles[0], color: computedStyle.getPropertyValue('--tier-bajo').trim(), label: 'Bajo' },
-        { threshold: tertiles[1], color: computedStyle.getPropertyValue('--tier-medio').trim(), label: 'Medio' },
-        { threshold: tertiles[2], color: computedStyle.getPropertyValue('--tier-alto').trim(), label: 'Alto' },
-      ];
-      
-      setColorScale({
-        domain: range,
-        breakpoints,
-      });
-    }
-  }, [viewState.level]);
 
   // Keyboard navigation
   useEffect(() => {
