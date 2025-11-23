@@ -19,7 +19,7 @@ export function MapLegend({ colorScale, showStatistics = true, nationalAverage }
   });
 
   return (
-    <div className="w-full space-y-3" style={{ backgroundColor: '#121A1D' }}>
+    <div className="w-full space-y-3">
       {/* Legend Title and Stats */}
       <div className="flex items-center justify-between">
         <div className="text-white/70 text-xs font-light">

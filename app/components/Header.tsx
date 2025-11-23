@@ -19,7 +19,7 @@ export function Header() {
                     height={40}
                     className="fill-foreground"
                 />
-                <h1 className="text-xl font-semibold">Lorem Ipsum</h1>
+                <h1 className="text-xl font-semibold">Vigil Chile</h1>
             </div>
 
             <NavigationMenu>

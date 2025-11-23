@@ -12,7 +12,7 @@ function MapContainerSuspense() {
 
 function MapLoadingFallback() {
   return (
-    <div className="w-full h-screen flex flex-col" style={{ backgroundColor: '#121A1D' }}>
+    <div className="w-full h-screen flex flex-col">
       <header className="px-8 py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -34,7 +34,7 @@ function MapLoadingFallback() {
 
 export default function Home() {
   return (
-    <main className="w-full h-screen" style={{ backgroundColor: '#121A1D' }}>
+    <main className="w-full h-screen">
       <MapContainerSuspense />
     </main>
   );

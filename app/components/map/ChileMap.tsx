@@ -170,7 +170,6 @@ export function ChileMap({
         ref={svgRef}
         width={dimensions.width}
         height={dimensions.height}
-        style={{ backgroundColor: '#121A1D' }}
       >
         <g className="map-container">
           {/* Render regions when in country view */}

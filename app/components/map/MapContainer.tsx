@@ -253,7 +253,7 @@ export function MapContainer() {
 
   if (loading) {
     return (
-      <div className="w-full h-screen flex flex-col" style={{ backgroundColor: '#121A1D' }}>
+      <div className="w-full h-screen flex flex-col" >
         {/* Header Skeleton */}
         <header className="px-8 py-6">
           <div className="flex items-center justify-between">
@@ -289,7 +289,7 @@ export function MapContainer() {
 
   if (error) {
     return (
-      <div className="w-full h-screen flex items-center justify-center p-8" style={{ backgroundColor: '#121A1D' }}>
+      <div className="w-full h-screen flex items-center justify-center p-8" >
         <div className="max-w-md w-full">
           <Alert variant="destructive" className="bg-red-900/20 border-red-500/50">
             <AlertCircle className="h-5 w-5" />
@@ -312,7 +312,7 @@ export function MapContainer() {
   }
 
   return (
-    <div className="w-full h-screen flex flex-col" style={{ backgroundColor: '#121A1D' }}>
+    <div className="w-full h-screen flex flex-col" >
 
       {/* Main Title */}
       <div className="px-8 py-4 text-center">
@@ -323,7 +323,7 @@ export function MapContainer() {
 
       {/* Map Container */}
       <div className="flex-1 px-8 pb-2 overflow-hidden relative">
-        <div className="w-full h-full" style={{ backgroundColor: '#121A1D' }}>
+        <div className="w-full h-full" >
           <ChileMap
             regionsData={regionsData}
             municipalitiesData={municipalitiesData}
