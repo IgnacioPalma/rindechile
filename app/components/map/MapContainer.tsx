@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ChileMap } from './ChileMap';
 import { MapLegend } from './MapLegend';
-import { MunicipalityDetail } from './MunicipalityDetail';
+import { MunicipalityPanel } from './MunicipalityPanel';
 import { MapLoadingState } from './MapLoadingState';
 import { MapErrorState } from './MapErrorState';
 import { Button } from '@/app/components/ui/button';
@@ -42,8 +42,6 @@ export function MapContainer() {
   const {
     viewState,
     selectedMunicipalityData,
-    dialogOpen,
-    setDialogOpen,
     handleRegionClick,
     handleMunicipalityClick,
     handleBackToCountry,
@@ -204,9 +202,7 @@ export function MapContainer() {
     const handleKeyDown = (event: KeyboardEvent) => {
       // ESC key to go back
       if (event.key === 'Escape') {
-        if (dialogOpen) {
-          setDialogOpen(false);
-        } else if (viewState.level === 'region') {
+        if (viewState.level === 'region') {
           handleBackToCountry();
         }
       }
@@ -214,7 +210,7 @@ export function MapContainer() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [viewState.level, dialogOpen, handleBackToCountry, setDialogOpen]);
+  }, [viewState.level, handleBackToCountry]);
 
   if (loading) {
     return <MapLoadingState />;
@@ -233,36 +229,57 @@ export function MapContainer() {
         </h2>
       </div>
 
-      {/* Map Container */}
-      <div className="flex-1 px-8 pb-2 overflow-hidden relative">
-        <div className="w-full h-full">
-          <ChileMap
-            regionsData={regionsData}
-            municipalitiesData={municipalitiesData}
-            loadingMunicipalities={loadingMunicipalities}
-            onRegionClick={handleRegionClick}
-            onMunicipalityClick={handleMunicipalityClick}
-            viewState={viewState}
-            colorScale={colorScale}
-          />
-        </div>
+      {/* Main Content: Map + Panel Grid */}
+      <div className="flex-1 px-8 pb-2 overflow-hidden">
+        {viewState.level === 'country' ? (
+          // Country view: Just the map
+          <div className="w-full h-full flex flex-col">
+            <div className="flex-1 overflow-hidden">
+              <ChileMap
+                regionsData={regionsData}
+                municipalitiesData={municipalitiesData}
+                loadingMunicipalities={loadingMunicipalities}
+                onRegionClick={handleRegionClick}
+                onMunicipalityClick={handleMunicipalityClick}
+                viewState={viewState}
+                colorScale={colorScale}
+              />
+            </div>
+          </div>
+        ) : (
+          // Region view: Map + Municipality Panel (responsive grid)
+          <div className="w-full h-full grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-4">
+            {/* Map Section */}
+            <div className="flex flex-col min-h-0">
+              <div className="flex-1 overflow-hidden">
+                <ChileMap
+                  regionsData={regionsData}
+                  municipalitiesData={municipalitiesData}
+                  loadingMunicipalities={loadingMunicipalities}
+                  onRegionClick={handleRegionClick}
+                  onMunicipalityClick={handleMunicipalityClick}
+                  viewState={viewState}
+                  colorScale={colorScale}
+                />
+              </div>
+            </div>
+
+            {/* Municipality Detail Panel */}
+            <div className="min-h-0 lg:h-full">
+              <MunicipalityPanel
+                municipalityName={selectedMunicipalityData?.name || null}
+                regionName={selectedMunicipalityData?.regionName || null}
+                data={selectedMunicipalityData?.data || null}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Legend at Bottom */}
       <div className="px-8 pb-8">
         <MapLegend colorScale={colorScale} nationalAverage={nationalAverage} />
       </div>
-
-      {/* Municipality Detail Dialog */}
-      {selectedMunicipalityData && (
-        <MunicipalityDetail
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
-          municipalityName={selectedMunicipalityData.name}
-          regionName={selectedMunicipalityData.regionName}
-          data={selectedMunicipalityData.data}
-        />
-      )}
 
       {/* ARIA Live Region for Screen Reader Announcements */}
       <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">

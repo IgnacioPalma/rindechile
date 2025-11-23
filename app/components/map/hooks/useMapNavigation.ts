@@ -37,8 +37,6 @@ export function useMapNavigation({
 
   const [selectedMunicipalityData, setSelectedMunicipalityData] =
     useState<SelectedMunicipalityData | null>(null);
-  
-  const [dialogOpen, setDialogOpen] = useState(false);
 
   // Initialize view from URL params
   useEffect(() => {
@@ -70,6 +68,9 @@ export function useMapNavigation({
         selectedMunicipality: null,
       });
 
+      // Clear selected municipality data
+      setSelectedMunicipalityData(null);
+
       // Update URL
       const params = new URLSearchParams();
       params.set('region', regionCode);
@@ -86,12 +87,18 @@ export function useMapNavigation({
     );
 
     if (municipality) {
+      // Update viewState with selected municipality
+      setViewState((prev) => ({
+        ...prev,
+        selectedMunicipality: municipality.feature,
+      }));
+
+      // Update municipality data for the panel
       setSelectedMunicipalityData({
         name: municipality.feature.properties.Comuna,
         regionName: viewState.selectedRegion?.properties.Region || '',
         data: municipality.data,
       });
-      setDialogOpen(true);
 
       // Announce to screen readers
       onAnnounce(`Mostrando detalles de ${municipality.feature.properties.Comuna}`);
@@ -105,6 +112,9 @@ export function useMapNavigation({
       selectedMunicipality: null,
     });
 
+    // Clear selected municipality data
+    setSelectedMunicipalityData(null);
+
     // Clear URL params
     router.push('/', { scroll: false });
 
@@ -115,8 +125,6 @@ export function useMapNavigation({
   return {
     viewState,
     selectedMunicipalityData,
-    dialogOpen,
-    setDialogOpen,
     handleRegionClick,
     handleMunicipalityClick,
     handleBackToCountry,

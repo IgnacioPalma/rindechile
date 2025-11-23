@@ -33,17 +33,24 @@ export function ChileMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [viewportSize, setViewportSize] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
 
-  // Detect mobile screen size (below md breakpoint: 768px)
+  // Detect viewport size: mobile (<768px), tablet (768-1154px), desktop (>=1154px)
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+    const checkViewportSize = () => {
+      const width = window.innerWidth;
+      if (width < 768) {
+        setViewportSize('mobile');
+      } else if (width < 1154) {
+        setViewportSize('tablet');
+      } else {
+        setViewportSize('desktop');
+      }
     };
     
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    checkViewportSize();
+    window.addEventListener('resize', checkViewportSize);
+    return () => window.removeEventListener('resize', checkViewportSize);
   }, []);
 
   // Handle responsive sizing
@@ -76,14 +83,31 @@ export function ChileMap({
         );
     }
     
-    // Default: center on Chile with rotation on desktop
-    const rotation = isMobile ? 0 : 0; // Rotate 90° on desktop, 0° on mobile
+    // Default: center on Chile with breakpoint-specific values
+    let center: [number, number];
+    let scale: number;
+    let rotate: [number, number, number];
+    
+    if (viewportSize === 'mobile') {
+      center = [-71, -38];
+      scale = 700;
+      rotate = [71, 38, 0];
+    } else if (viewportSize === 'tablet') {
+      center = [-71, -38];
+      scale = 850;
+      rotate = [71, 38, 90];
+    } else {
+      center = [-71, -38];
+      scale = 1350;
+      rotate = [71, 38, 90];
+    }
+    
     return baseProjection
-      .rotate([0, 0, rotation])
-      .center([-71, -35])
-      .scale(800)
+      .rotate(rotate)
+      .center([0, 0])
+      .scale(scale)
       .translate([dimensions.width / 2, dimensions.height / 2]);
-  }, [viewState.level, viewState.selectedRegion, dimensions, municipalitiesData, isMobile]);
+  }, [viewState.level, viewState.selectedRegion, dimensions, municipalitiesData, viewportSize]);
 
   // Create path generator with reactive projection updates
   const pathGenerator = useMemo(
