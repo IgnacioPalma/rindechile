@@ -26,7 +26,11 @@ import {
 import { useAriaLive } from './hooks/useAriaLive';
 import { useMapNavigation } from './hooks/useMapNavigation';
 
-export function MapContainer() {
+interface MapContainerProps {
+  initialRegionCode?: number;
+}
+
+export function MapContainer({ initialRegionCode }: MapContainerProps = {}) {
   const [regionsData, setRegionsData] = useState<EnrichedRegionData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +53,7 @@ export function MapContainer() {
     regionsData,
     municipalitiesData,
     onAnnounce: announce,
+    initialRegionCode,
   });
 
   // Initialize color scale

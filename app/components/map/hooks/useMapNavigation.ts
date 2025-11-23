@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { getSlugFromCode, getCodeFromSlug } from '@/lib/region-slugs';
 import type {
   MapViewState,
   EnrichedRegionData,
@@ -19,15 +20,17 @@ interface UseMapNavigationProps {
   regionsData: EnrichedRegionData[];
   municipalitiesData: EnrichedMunicipalityData[];
   onAnnounce: (message: string) => void;
+  initialRegionCode?: number;
 }
 
 export function useMapNavigation({
   regionsData,
   municipalitiesData,
   onAnnounce,
+  initialRegionCode,
 }: UseMapNavigationProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const [viewState, setViewState] = useState<MapViewState>({
     level: 'country',
@@ -38,15 +41,29 @@ export function useMapNavigation({
   const [selectedMunicipalityData, setSelectedMunicipalityData] =
     useState<SelectedMunicipalityData | null>(null);
 
-  // Initialize view from URL params
+  // Initialize view from URL or initialRegionCode
   useEffect(() => {
-    const regionParam = searchParams.get('region');
-    if (regionParam && regionsData.length > 0) {
+    if (regionsData.length === 0) return;
+
+    // Try to get region code from URL pathname first
+    let regionCode: number | null = null;
+    
+    if (pathname !== '/') {
+      const slug = pathname.replace('/', '');
+      regionCode = getCodeFromSlug(slug);
+    }
+    
+    // Fallback to initialRegionCode prop if no valid slug in URL
+    if (!regionCode && initialRegionCode) {
+      regionCode = initialRegionCode;
+    }
+
+    if (regionCode && viewState.level === 'country') {
       const region = regionsData.find(
-        (r) => r.feature.properties.codregion.toString() === regionParam
+        (r) => r.feature.properties.codregion === regionCode
       );
 
-      if (region && viewState.level === 'country') {
+      if (region) {
         setViewState({
           level: 'region',
           selectedRegion: region.feature,
@@ -54,7 +71,7 @@ export function useMapNavigation({
         });
       }
     }
-  }, [searchParams, regionsData, viewState.level]);
+  }, [pathname, regionsData, viewState.level, initialRegionCode]);
 
   const handleRegionClick = (regionCode: string) => {
     const region = regionsData.find(
@@ -71,10 +88,11 @@ export function useMapNavigation({
       // Clear selected municipality data
       setSelectedMunicipalityData(null);
 
-      // Update URL
-      const params = new URLSearchParams();
-      params.set('region', regionCode);
-      router.push(`?${params.toString()}`, { scroll: false });
+      // Update URL with slug
+      const slug = getSlugFromCode(Number(regionCode));
+      if (slug) {
+        router.push(`/${slug}`, { scroll: false });
+      }
 
       // Announce to screen readers
       onAnnounce(`Mostrando región ${region.feature.properties.Region}`);
