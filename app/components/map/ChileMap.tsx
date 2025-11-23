@@ -77,7 +77,7 @@ export function ChileMap({
     }
     
     // Default: center on Chile with rotation on desktop
-    const rotation = isMobile ? 0 : 5; // Rotate 90° on desktop, 0° on mobile
+    const rotation = isMobile ? 0 : 0; // Rotate 90° on desktop, 0° on mobile
     return baseProjection
       .rotate([0, 0, rotation])
       .center([-71, -35])
@@ -97,9 +97,16 @@ export function ChileMap({
       if (overpricing === null || overpricing === undefined) {
         return '#E5E7EB'; // Gray for no data
       }
-      return d3.interpolate(colorScale.lowColor, colorScale.highColor)(
-        (overpricing - colorScale.domain[0]) / (colorScale.domain[1] - colorScale.domain[0])
-      );
+      
+      // Find the appropriate tier based on threshold
+      for (let i = colorScale.breakpoints.length - 1; i >= 0; i--) {
+        if (overpricing >= colorScale.breakpoints[i].threshold) {
+          return colorScale.breakpoints[i].color;
+        }
+      }
+      
+      // Default to first tier if below all thresholds
+      return colorScale.breakpoints[0]?.color || '#E5E7EB';
     },
     [colorScale]
   );
@@ -165,7 +172,7 @@ export function ChileMap({
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-full h-full">
+    <div ref={containerRef} className="relative w-full h-full border border-border rounded-sm">
       <svg
         ref={svgRef}
         width={dimensions.width}
@@ -179,8 +186,8 @@ export function ChileMap({
                 key={region.feature.properties.codregion}
                 d={pathGenerator(region.feature) || ''}
                 fill={getColor(region.averageOverpricing)}
-                stroke="#FFFFFF"
-                strokeWidth={1}
+                stroke="#010101"
+                strokeWidth={0.8}
                 className="cursor-pointer transition-opacity hover:opacity-80"
                 onClick={() => handleRegionClick(region.feature.properties.codregion.toString())}
                 onMouseEnter={(e) =>
@@ -205,8 +212,8 @@ export function ChileMap({
                 key={municipality.feature.properties.cod_comuna}
                 d={pathGenerator(municipality.feature) || ''}
                 fill={getColor(municipality.data?.porcentaje_sobreprecio)}
-                stroke="#FFFFFF"
-                strokeWidth={0.5}
+                stroke="#010101"
+                strokeWidth={0.8}
                 className="cursor-pointer transition-opacity hover:opacity-80"
                 onClick={() => handleMunicipalityClick(municipality.feature.properties.cod_comuna.toString())}
                 onMouseEnter={(e) =>

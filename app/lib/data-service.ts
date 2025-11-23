@@ -210,6 +210,44 @@ export function getRegionOverpricingRange(): [number, number] {
 }
 
 /**
+ * Calculates quintile breakpoints from a dataset (0-20%, 20-40%, etc.)
+ */
+export function calculateQuintileBreakpoints(percentages: number[]): number[] {
+  if (percentages.length === 0) {
+    return [0, 20, 40, 60, 80];
+  }
+  
+  const sorted = [...percentages].sort((a, b) => a - b);
+  const n = sorted.length;
+  
+  return [
+    sorted[0], // Min (0th percentile)
+    sorted[Math.floor(n * 0.2)], // 20th percentile
+    sorted[Math.floor(n * 0.4)], // 40th percentile
+    sorted[Math.floor(n * 0.6)], // 60th percentile
+    sorted[Math.floor(n * 0.8)], // 80th percentile
+  ];
+}
+
+/**
+ * Gets quintile breakpoints for municipality data
+ */
+export function getMunicipalityQuintileBreakpoints(): number[] {
+  const data = getMunicipalityData();
+  const percentages = Object.values(data).map(d => d.porcentaje_sobreprecio);
+  return calculateQuintileBreakpoints(percentages);
+}
+
+/**
+ * Gets quintile breakpoints for region data
+ */
+export function getRegionQuintileBreakpoints(): number[] {
+  const data = getRegionData();
+  const percentages = Object.values(data).map(d => d.porcentaje_sobreprecio);
+  return calculateQuintileBreakpoints(percentages);
+}
+
+/**
  * Gets the range of overpricing percentages across all data
  * @deprecated Use getMunicipalityOverpricingRange() or getRegionOverpricingRange() instead
  */

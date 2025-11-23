@@ -102,11 +102,15 @@ export interface MapViewState {
 }
 
 // Color scale types
+export interface ColorBreakpoint {
+  threshold: number;
+  color: string;
+  label: string;
+}
+
 export interface ColorScale {
   domain: [number, number];
-  lowColor: string;
-  highColor: string;
-  interpolate: (t: number) => string;
+  breakpoints: ColorBreakpoint[];
 }
 
 // Tooltip data

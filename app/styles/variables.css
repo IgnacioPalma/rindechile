@@ -40,11 +40,18 @@
   /* Custom breakpoints */
     --breakpoint-tablet: 768px;
     --breakpoint-desktop: 1154px;
+
+  /* Map tier colors */
+  --map-tier-muy-bajo: var(--tier-muy-bajo);
+  --map-tier-bajo: var(--tier-bajo);
+  --map-tier-medio: var(--tier-medio);
+  --map-tier-alto: var(--tier-alto);
+  --map-tier-muy-alto: var(--tier-muy-alto);
 }
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(0.1112 0.0132 222.8);
+  --background: oklch(0.0 0.0132 222.8);
   --foreground: oklch(0.9112 0.0132 222.8);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -75,4 +82,11 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Map tier colors - Placeholder values, convert to oklch */
+  --tier-muy-bajo: #00A0DA;
+  --tier-bajo: #5FCE41;
+  --tier-medio: #989898;
+  --tier-alto: #F9B700;
+  --tier-muy-alto: #E33531;
 }

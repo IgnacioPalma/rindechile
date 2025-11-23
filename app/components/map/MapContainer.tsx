@@ -21,6 +21,8 @@ import {
   getRegionOverpricingRange,
   loadMunicipalitiesGeoJSON,
   enrichMunicipalityData,
+  getMunicipalityQuintileBreakpoints,
+  getRegionQuintileBreakpoints,
 } from '@/app/lib/data-service';
 import { useAriaLive } from './hooks/useAriaLive';
 import { useMapNavigation } from './hooks/useMapNavigation';
@@ -55,10 +57,30 @@ export function MapContainer() {
   // Initialize color scale
   const [colorScale, setColorScale] = useState<ColorScale>({
     domain: [0, 100],
-    lowColor: '#68CCDB',
-    highColor: '#ED2472',
-    interpolate: (t: number) => '',
+    breakpoints: [],
   });
+
+  // Initialize breakpoints with CSS variables on mount
+  useEffect(() => {
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
+    
+    // Get quintile breakpoints from region data (for initial country view)
+    const quintiles = getRegionQuintileBreakpoints();
+    
+    const breakpoints = [
+      { threshold: quintiles[0], color: computedStyle.getPropertyValue('--tier-muy-bajo').trim(), label: 'Muy Bajo' },
+      { threshold: quintiles[1], color: computedStyle.getPropertyValue('--tier-bajo').trim(), label: 'Bajo' },
+      { threshold: quintiles[2], color: computedStyle.getPropertyValue('--tier-medio').trim(), label: 'Medio' },
+      { threshold: quintiles[3], color: computedStyle.getPropertyValue('--tier-alto').trim(), label: 'Alto' },
+      { threshold: quintiles[4], color: computedStyle.getPropertyValue('--tier-muy-alto').trim(), label: 'Muy Alto' },
+    ];
+    
+    setColorScale((prev) => ({
+      ...prev,
+      breakpoints,
+    }));
+  }, []);
 
   // Load initial data
   useEffect(() => {
@@ -127,20 +149,43 @@ export function MapContainer() {
 
   // Update color scale range based on view level
   useEffect(() => {
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
+    
     if (viewState.level === 'country') {
-      // Use region range for country view
+      // Use region range and quintiles for country view
       const range = getRegionOverpricingRange();
-      setColorScale((prev) => ({
-        ...prev,
+      const quintiles = getRegionQuintileBreakpoints();
+      
+      const breakpoints = [
+        { threshold: quintiles[0], color: computedStyle.getPropertyValue('--tier-muy-bajo').trim(), label: 'Muy Bajo' },
+        { threshold: quintiles[1], color: computedStyle.getPropertyValue('--tier-bajo').trim(), label: 'Bajo' },
+        { threshold: quintiles[2], color: computedStyle.getPropertyValue('--tier-medio').trim(), label: 'Medio' },
+        { threshold: quintiles[3], color: computedStyle.getPropertyValue('--tier-alto').trim(), label: 'Alto' },
+        { threshold: quintiles[4], color: computedStyle.getPropertyValue('--tier-muy-alto').trim(), label: 'Muy Alto' },
+      ];
+      
+      setColorScale({
         domain: range,
-      }));
+        breakpoints,
+      });
     } else if (viewState.level === 'region') {
-      // Use municipality range for region view
+      // Use municipality range and quintiles for region view
       const range = getMunicipalityOverpricingRange();
-      setColorScale((prev) => ({
-        ...prev,
+      const quintiles = getMunicipalityQuintileBreakpoints();
+      
+      const breakpoints = [
+        { threshold: quintiles[0], color: computedStyle.getPropertyValue('--tier-muy-bajo').trim(), label: 'Muy Bajo' },
+        { threshold: quintiles[1], color: computedStyle.getPropertyValue('--tier-bajo').trim(), label: 'Bajo' },
+        { threshold: quintiles[2], color: computedStyle.getPropertyValue('--tier-medio').trim(), label: 'Medio' },
+        { threshold: quintiles[3], color: computedStyle.getPropertyValue('--tier-alto').trim(), label: 'Alto' },
+        { threshold: quintiles[4], color: computedStyle.getPropertyValue('--tier-muy-alto').trim(), label: 'Muy Alto' },
+      ];
+      
+      setColorScale({
         domain: range,
-      }));
+        breakpoints,
+      });
     }
   }, [viewState.level]);
 
