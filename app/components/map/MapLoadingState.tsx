@@ -2,35 +2,27 @@ import { Skeleton } from '@/app/components/ui/skeleton';
 
 export function MapLoadingState() {
   return (
-    <div className="w-full h-screen flex flex-col">
+    <div className="w-full py-8 tablet:w-2/5 flex flex-col bg-secondary rounded-xl border border-border">
       {/* Header Skeleton */}
-      <header className="px-8 py-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Skeleton className="h-10 w-10 rounded-full bg-white/10" />
-            <Skeleton className="h-6 w-48 bg-white/10" />
-          </div>
-          <Skeleton className="h-9 w-32 bg-white/10" />
-        </div>
-      </header>
-
-      {/* Title Skeleton */}
-      <div className="px-8 py-4 text-center">
-        <Skeleton className="h-8 w-96 mx-auto bg-white/10" />
+      <div className="px-8">
+        <Skeleton className="h-7 w-64 bg-foreground/10 mb-2" />
+        <Skeleton className="h-4 w-80 bg-foreground/10" />
       </div>
 
       {/* Map Loading State */}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-white/20 border-t-white" />
-          <p className="text-white/80">Cargando datos del mapa...</p>
-          <p className="text-white/50 text-sm">Preparando visualización</p>
+      <div className="flex-1 overflow-hidden my-8">
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-foreground/20 border-t-foreground" />
+            <p className="text-foreground/80">Cargando datos del mapa...</p>
+            <p className="text-foreground/50 text-sm">Preparando visualización</p>
+          </div>
         </div>
       </div>
 
       {/* Legend Skeleton */}
-      <div className="px-8 pb-8">
-        <Skeleton className="h-16 w-full bg-white/10" />
+      <div className="px-8">
+        <Skeleton className="h-16 w-full bg-foreground/10" />
       </div>
     </div>
   );
