@@ -11,7 +11,10 @@
     "preinstall": "npx only-allow pnpm",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "drizzle:generate": "drizzle-kit generate",
+    "drizzle:migrate": "drizzle-kit migrate",
+    "drizzle:dev": "drizzle-kit studio"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.13.1",
@@ -23,6 +26,8 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "d3": "^7.9.0",
+    "drizzle-kit": "^0.31.7",
+    "drizzle-orm": "^0.44.7",
     "lucide-react": "^0.554.0",
     "next": "16.0.3",
     "react": "19.2.0",
