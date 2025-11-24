@@ -13,6 +13,7 @@ import type {
 interface SelectedMunicipalityData {
   name: string;
   regionName: string;
+  municipalityId: number;
   data: MunicipalityData | null;
 }
 
@@ -115,6 +116,7 @@ export function useMapNavigation({
       setSelectedMunicipalityData({
         name: municipality.feature.properties.Comuna,
         regionName: viewState.selectedRegion?.properties.Region || '',
+        municipalityId: municipality.feature.properties.cod_comuna,
         data: municipality.data,
       });
 

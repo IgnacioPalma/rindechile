@@ -33,12 +33,14 @@ export type DetailPanelData =
   | {
       level: 'region';
       name: string;
+      regionId: string;
       data: RegionData;
     }
   | {
       level: 'municipality';
       name: string;
       regionName: string;
+      municipalityId: number;
       data: MunicipalityData;
     }
   | null;
@@ -178,6 +180,7 @@ export function MapProvider({
           level: 'municipality',
           name: selectedMunicipalityData.name,
           regionName: selectedMunicipalityData.regionName,
+          municipalityId: selectedMunicipalityData.municipalityId,
           data: selectedMunicipalityData.data,
         };
       }
@@ -187,6 +190,7 @@ export function MapProvider({
         return {
           level: 'region',
           name: regionName,
+          regionId: regionCode.toString(),
           data: regionData,
         };
       }

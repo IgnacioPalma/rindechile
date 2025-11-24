@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import type { DetailPanelData } from '@/app/contexts/MapContext';
 import {
   Table,
@@ -10,6 +11,9 @@ import {
   TableRow,
 } from '@/app/components/ui/table';
 import { Badge } from '@/app/components/ui/badge';
+import { TreemapChart } from '@/app/components/map/TreemapChart';
+import { getTreemapData } from '@/app/lib/data-service';
+import type { TreemapHierarchy } from '@/types/map';
 
 interface DetailPanelProps {
   data: DetailPanelData;
@@ -31,6 +35,43 @@ function getSeverityInfo(percentage: number): {
 }
 
 export function DetailPanel({ data }: DetailPanelProps) {
+  const [treemapData, setTreemapData] = useState<TreemapHierarchy | null>(null);
+  const [loadingTreemap, setLoadingTreemap] = useState(false);
+  const [treemapError, setTreemapError] = useState<string | null>(null);
+
+  // Fetch treemap data when detail panel data changes
+  useEffect(() => {
+    if (!data) {
+      setTreemapData(null);
+      return;
+    }
+
+    const fetchTreemap = async () => {
+      setLoadingTreemap(true);
+      setTreemapError(null);
+
+      try {
+        let result: TreemapHierarchy | null = null;
+
+        if (data.level === 'country') {
+          result = await getTreemapData('country');
+        } else if (data.level === 'region') {
+          result = await getTreemapData('region', data.regionId);
+        } else if (data.level === 'municipality') {
+          result = await getTreemapData('municipality', data.municipalityId.toString());
+        }
+
+        setTreemapData(result);
+      } catch (error) {
+        console.error('Error fetching treemap:', error);
+        setTreemapError('Failed to load treemap data');
+      } finally {
+        setLoadingTreemap(false);
+      }
+    };
+
+    fetchTreemap();
+  }, [data]);
 
   // Empty state when no data
   if (!data) {
@@ -118,29 +159,45 @@ export function DetailPanel({ data }: DetailPanelProps) {
         </div>
       </div>
 
-      {/* D3 Chart Placeholder */}
-      <div className="rounded-lg border border-border p-6 mb-6 bg-muted/20">
-        <div className="text-center py-12">
-          <svg
-            className="mx-auto h-16 w-16 text-muted-foreground mb-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-            />
-          </svg>
-          <p className="text-sm text-muted-foreground">
-            D3 Chart Placeholder
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Visualizations coming soon
-          </p>
-        </div>
+      {/* Treemap Visualization */}
+      <div className="rounded-lg border border-border p-6 mb-6">
+        <h3 className="text-sm font-medium mb-4">Purchase Distribution by Category</h3>
+        {loadingTreemap && (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+              <p className="mt-2 text-sm text-muted-foreground">Loading visualization...</p>
+            </div>
+          </div>
+        )}
+        {treemapError && (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <svg
+                className="mx-auto h-12 w-12 text-destructive mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+              <p className="text-sm text-destructive">{treemapError}</p>
+            </div>
+          </div>
+        )}
+        {!loadingTreemap && !treemapError && treemapData && (
+          <TreemapChart data={treemapData} width={700} height={400} />
+        )}
+        {!loadingTreemap && !treemapError && !treemapData && (
+          <div className="text-center py-12">
+            <p className="text-sm text-muted-foreground">No data available</p>
+          </div>
+        )}
       </div>
 
       {/* Detailed Table */}

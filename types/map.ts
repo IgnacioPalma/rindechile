@@ -121,3 +121,26 @@ export interface TooltipData {
   x: number;
   y: number;
 }
+
+// Treemap visualization types
+export type TreemapNodeType = 'segment' | 'family' | 'class';
+
+export interface TreemapNode {
+  id: string;
+  name: string;
+  value: number; // Total purchase value (amount * unit_price)
+  overpricingRate: number; // Percentage of overpriced purchases
+  children?: TreemapNode[];
+  type: TreemapNodeType;
+}
+
+export interface TreemapHierarchy {
+  name: string; // e.g., "Chile", "Region Metropolitana", "Municipality Name"
+  children: TreemapNode[];
+}
+
+export interface TreemapResponse {
+  success: boolean;
+  data?: TreemapHierarchy;
+  error?: string;
+}

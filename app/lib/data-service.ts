@@ -6,6 +6,8 @@ import type {
   EnrichedMunicipalityData,
   RegionDataMap,
   RegionData,
+  TreemapHierarchy,
+  TreemapResponse,
 } from '@/types/map';
 
 import { findRegionDataKey } from './name-normalizer';
@@ -320,3 +322,40 @@ export async function preloadMunicipalityData(regionCode: number): Promise<void>
     await loadMunicipalitiesGeoJSON(regionCode);
   }
 }
+
+/**
+ * Fetches treemap data for visualization
+ * @param level - 'country', 'region', or 'municipality'
+ * @param code - Region ID or municipality ID (required for region/municipality)
+ */
+export async function getTreemapData(
+  level: 'country' | 'region' | 'municipality',
+  code?: string
+): Promise<TreemapHierarchy | null> {
+  try {
+    const params = new URLSearchParams({ level });
+    if (code) {
+      params.append('code', code);
+    }
+
+    const response = await fetch(`/api/treemap?${params.toString()}`);
+    
+    if (!response.ok) {
+      console.error(`Failed to fetch treemap data: ${response.statusText}`);
+      return null;
+    }
+
+    const result: TreemapResponse = await response.json();
+    
+    if (!result.success || !result.data) {
+      console.error('Treemap API returned unsuccessful response:', result.error);
+      return null;
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error('Error fetching treemap data:', error);
+    return null;
+  }
+}
+
