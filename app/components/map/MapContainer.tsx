@@ -68,6 +68,7 @@ export function MapContainer() {
         <h2 className="text-xl font-semibold">
           Compras Anómalas en Chile
         </h2>
+        <p className="text-sm text-secondary-foreground font-medium max-w-[20rem]">Descúbre las anomalías en las compras públicas a nivel nacional, regional y municipal.</p>
       </div>
 
       {/* Main Content: Map */}
