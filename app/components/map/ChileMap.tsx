@@ -9,7 +9,6 @@ import type {
   ColorScale,
 } from '@/types/map';
 import { useViewportSize } from './hooks/useViewportSize';
-import { useTooltip } from './hooks/useTooltip';
 
 interface ChileMapProps {
   regionsData: EnrichedRegionData[];
@@ -36,7 +35,6 @@ export function ChileMap({
   
   // Use custom hooks
   const viewportSize = useViewportSize();
-  const { tooltip, showTooltip, hideTooltip } = useTooltip();
 
   // Handle responsive sizing
   useEffect(() => {
@@ -59,7 +57,7 @@ export function ChileMap({
     
     if (viewState.level === 'region' && viewState.selectedRegion && municipalitiesData.length > 0) {
       // Use D3's fitExtent to automatically calculate correct projection parameters
-      const padding = 100;
+      const padding = 20;
       return baseProjection
         .rotate([0, 0, 0]) // Reset rotation for region view
         .fitExtent(
@@ -160,16 +158,6 @@ export function ChileMap({
                 strokeWidth={0.6}
                 className="cursor-pointer transition-opacity hover:opacity-80"
                 onClick={() => handleRegionClick(region.feature.properties.codregion.toString())}
-                onMouseEnter={(e) =>
-                  showTooltip(
-                    {
-                      name: region.feature.properties.Region,
-                      overpricing: region.averageOverpricing,
-                    },
-                    e
-                  )
-                }
-                onMouseLeave={hideTooltip}
               />
             ))}
 
@@ -184,16 +172,6 @@ export function ChileMap({
                 strokeWidth={0.9}
                 className="cursor-pointer transition-opacity hover:opacity-80"
                 onClick={() => handleMunicipalityClick(municipality.feature.properties.cod_comuna.toString())}
-                onMouseEnter={(e) =>
-                  showTooltip(
-                    {
-                      name: municipality.feature.properties.Comuna,
-                      overpricing: municipality.data?.porcentaje_sobreprecio || null,
-                    },
-                    e
-                  )
-                }
-                onMouseLeave={hideTooltip}
               />
             ))}
 
@@ -211,23 +189,6 @@ export function ChileMap({
         </g>
       </svg>
 
-      {/* Tooltip */}
-      {tooltip && (
-        <div
-          className="absolute pointer-events-none bg-gray-900 text-white px-3 py-2 rounded shadow-lg text-sm z-50"
-          style={{
-            left: tooltip.x + 10,
-            top: tooltip.y + 10,
-          }}
-        >
-          <div className="font-semibold">{tooltip.name}</div>
-          {tooltip.overpricing !== null && tooltip.overpricing !== undefined ? (
-            <div>Overpricing: {tooltip.overpricing.toFixed(2)}%</div>
-          ) : (
-            <div className="text-gray-400">No data</div>
-          )}
-        </div>
-      )}
     </div>
   );
 }

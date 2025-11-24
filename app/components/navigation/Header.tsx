@@ -17,14 +17,10 @@ export function Header() {
                     />
                     <h1 className="text-base tablet:text-xl font-semibold whitespace-nowrap">Vigil Chile</h1>
                 </Link>
-
-                <Button size="sm" variant="ghost" className="text-sm hidden tablet:block whitespace-nowrap">
-                    Metodología
-                </Button>
             </div>
 
             <Button size="sm" className="text-xs tablet:text-sm whitespace-nowrap">
-                Apóyanos
+                Metodología
             </Button>
         </header>
     )
