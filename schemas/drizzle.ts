@@ -1,4 +1,4 @@
-import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
+import { text, integer, real, sqliteTable, primaryKey } from "drizzle-orm/sqlite-core";
 
 // UNSPSC Tables
 export const categories = sqliteTable("categories", {
@@ -38,36 +38,58 @@ export const commodities = sqliteTable("commodities", {
   name: text("name").notNull(),
 });
 
-// Data Tables
+// Data Tables -MAIRA EXTRA
 export const regions = sqliteTable("regions", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
+  region_id: integer("region_id").primaryKey(),
+  region_name: text("region_name").notNull(),
 });
 
+
+
 export const municipalities = sqliteTable("municipalities", {
-  id: integer("id").primaryKey(), // cod_comuna from GeoJSON
-  regionId: text("region_id")
+  municipality_id: integer("municipality_id").primaryKey(),
+  municipality_name: text("municipality_name").notNull(),
+  budget: real("budget"),
+  budget_per_capita: real("budget_per_capita"),
+  region_id: integer("region_id")
     .notNull()
-    .references(() => regions.id),
-  name: text("name").notNull(),
+    .references(() => regions.region_id),
+});
+
+export const items = sqliteTable("items", {
+  onu_code: text("onu_code").primaryKey(),
+  commodity_id: integer("commodity_id")
+    .references(() => commodities.id),
+  expected_min_range: integer("expected_min_range"),
+  expected_max_range: integer("expected_max_range"),
+  max_acceptable_price: real("max_acceptable_price"),
+  commodity_code: text("commodity_code"),
+  item_name: text("item_name").notNull(),
+  sufficient_data: integer("sufficient_data").notNull(), // boolean as 0/1
 });
 
 export const suppliers = sqliteTable("suppliers", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
+  supplier_rut: text("supplier_rut").primaryKey(),
+  supplier_name: text("supplier_name"),
+  supplier_size: text("supplier_size"),
 });
 
 export const purchases = sqliteTable("purchases", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  municipalityId: integer("municipality_id")
+  purchase_id: integer("purchase_id").primaryKey(),
+  purchase_code: text("purchase_code").notNull(),
+  municipality_id: integer("municipality_id")
     .notNull()
-    .references(() => municipalities.id),
-  supplierId: integer("supplier_id")
+    .references(() => municipalities.municipality_id),
+  supplier_rut: text("supplier_rut")
     .notNull()
-    .references(() => suppliers.id),
-  commodityId: text("commodity_id")
+    .references(() => suppliers.supplier_rut),
+  commodity_code: text("commodity_code"),
+  item_quantity: integer("item_quantity").notNull(),
+  unit_total_price: real("unit_total_price"),
+  is_expensive: integer("is_expensive"), 
+  price_excess_amount: real("price_excess_amount"),
+  price_excess_percentage: real("price_excess_percentage"),
+  onu_code: text("onu_code")
     .notNull()
-    .references(() => commodities.id),
-  amount: integer("amount").notNull(),
-  unit_price: integer("unit_price").notNull()
+    .references(() => items.onu_code),
 });
