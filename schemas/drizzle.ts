@@ -11,7 +11,7 @@ export const categories = sqliteTable("categories", {
 
 export const segments = sqliteTable("segments", {
   id: integer("id").primaryKey(),
-  categoryId: integer("category_id")
+  category_id: integer("category_id")
     .notNull()
     .references(() => categories.id),
   name: text("name").notNull(),
@@ -19,7 +19,7 @@ export const segments = sqliteTable("segments", {
 
 export const families = sqliteTable("families", {
   id: integer("id").primaryKey(),
-  segmentId: integer("segment_id")
+  segment_id: integer("segment_id")
     .notNull()
     .references(() => segments.id),
   name: text("name").notNull(),
@@ -27,7 +27,7 @@ export const families = sqliteTable("families", {
 
 export const classes = sqliteTable("classes", {
   id: integer("id").primaryKey(),
-  familyId: integer("family_id")
+  family_id: integer("family_id")
     .notNull()
     .references(() => families.id),
   name: text("name").notNull(),
@@ -35,7 +35,7 @@ export const classes = sqliteTable("classes", {
 
 export const commodities = sqliteTable("commodities", {
   id: integer("id").primaryKey(),
-  classId: integer("class_id")
+  class_id: integer("class_id")
     .notNull()
     .references(() => classes.id),
   name: text("name").notNull(),

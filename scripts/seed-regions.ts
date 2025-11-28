@@ -9,14 +9,14 @@ import { join } from 'path';
 import { execSync } from 'child_process';
 
 interface RegionRow {
-  region_id: string;
-  region_name: string;
+  id: string;
+  name: string;
 }
 
 interface RegionData {
   regions: Map<number, {
-    region_id: number;
-    region_name: string;
+    id: number;
+    name: string;
   }>;
 }
 
@@ -30,20 +30,20 @@ function parseCsv(filePath: string): RegionRow[] {
   return rows.map(line => {
     const parts = line.split(',');
     return {
-      region_id: parts[0],
-      region_name: parts[1],
+      id: parts[0],
+      name: parts[1],
     };
   });
 }
 
 function extractRegionData(rows: RegionRow[]): RegionData {
   const regions = new Map<number, {
-    region_id: number;
-    region_name: string;
+    id: number;
+    name: string;
   }>();
 
   for (const row of rows) {
-    const regionId = parseInt(row.region_id, 10);
+    const regionId = parseInt(row.id, 10);
     
     // Skip if already exists
     if (regions.has(regionId)) {
@@ -51,8 +51,8 @@ function extractRegionData(rows: RegionRow[]): RegionData {
     }
 
     regions.set(regionId, {
-      region_id: regionId,
-      region_name: row.region_name,
+      id: regionId,
+      name: row.name,
     });
   }
 
@@ -73,10 +73,10 @@ function generateSqlInserts(data: RegionData, batchSize: number = 500): string {
   for (let i = 0; i < regionEntries.length; i += batchSize) {
     const batch = regionEntries.slice(i, i + batchSize);
     const values = batch
-      .map(([, { region_id, region_name }]) => 
-        `(${region_id}, '${escapeSqlString(region_name)}')`)
+      .map(([, { id, name }]) => 
+        `(${id}, '${escapeSqlString(name)}')`)
       .join(',\n  ');
-    lines.push(`INSERT OR IGNORE INTO regions (region_id, region_name) VALUES\n  ${values};`);
+    lines.push(`INSERT OR IGNORE INTO regions (id, name) VALUES\n  ${values};`);
   }
 
   return lines.join('\n\n');

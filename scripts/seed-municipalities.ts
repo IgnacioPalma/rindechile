@@ -8,8 +8,8 @@ import { join } from 'path';
 import { execSync } from 'child_process';
 
 interface MunicipalityRow {
-  municipality_id: string;
-  municipality_name: string;
+  id: string;
+  name: string;
   budget: string;
   budget_per_capita: string;
   region_id: string;
@@ -17,8 +17,8 @@ interface MunicipalityRow {
 
 interface MunicipalityData {
   municipalities: Map<string, {
-    municipality_id: number;
-    municipality_name: string;
+    id: number;
+    name: string;
     budget: number;
     budget_per_capita: number;
     region_id: number;
@@ -35,8 +35,8 @@ function parseCsv(filePath: string): MunicipalityRow[] {
   return rows.map(line => {
     const parts = line.split(',');
     return {
-      municipality_id: parts[0],
-      municipality_name: parts[1],
+      id: parts[0],
+      name: parts[1],
       budget: parts[2],
       budget_per_capita: parts[3],
       region_id: parts[4],
@@ -46,8 +46,8 @@ function parseCsv(filePath: string): MunicipalityRow[] {
 
 function extractMunicipalityData(rows: MunicipalityRow[]): MunicipalityData {
   const municipalities = new Map<string, {
-    municipality_id: number;
-    municipality_name: string;
+    id: number;
+    name: string;
     budget: number;
     budget_per_capita: number;
     region_id: number;
@@ -55,13 +55,13 @@ function extractMunicipalityData(rows: MunicipalityRow[]): MunicipalityData {
 
   for (const row of rows) {
     // Skip if already exists
-    if (municipalities.has(row.municipality_id)) {
+    if (municipalities.has(row.id)) {
       continue;
     }
 
-    municipalities.set(row.municipality_id, {
-      municipality_id: parseInt(row.municipality_id, 10),
-      municipality_name: row.municipality_name,
+    municipalities.set(row.id, {
+      id: parseInt(row.id, 10),
+      name: row.name,
       budget: parseFloat(row.budget),
       budget_per_capita: parseFloat(row.budget_per_capita),
       region_id: parseInt(row.region_id, 10),
@@ -85,10 +85,10 @@ function generateSqlInserts(data: MunicipalityData, batchSize: number = 500): st
   for (let i = 0; i < municipalityEntries.length; i += batchSize) {
     const batch = municipalityEntries.slice(i, i + batchSize);
     const values = batch
-      .map(([, { municipality_id, municipality_name, budget, budget_per_capita, region_id }]) => 
-        `(${municipality_id}, '${escapeSqlString(municipality_name)}', ${budget}, ${budget_per_capita}, ${region_id})`)
+      .map(([, { id, name, budget, budget_per_capita, region_id }]) => 
+        `(${id}, '${escapeSqlString(name)}', ${budget}, ${budget_per_capita}, ${region_id})`)
       .join(',\n  ');
-    lines.push(`INSERT OR IGNORE INTO municipalities (municipality_id, municipality_name, budget, budget_per_capita, region_id) VALUES\n  ${values};`);
+    lines.push(`INSERT OR IGNORE INTO municipalities (id, name, budget, budget_per_capita, region_id) VALUES\n  ${values};`);
   }
 
   return lines.join('\n\n');

@@ -79,7 +79,7 @@ function generateSqlInserts(data: SupplierData, batchSize: number = 500): string
       .map(([, { supplier_rut, supplier_name, supplier_size }]) => 
         `('${escapeSqlString(supplier_rut)}', '${escapeSqlString(supplier_name)}', '${escapeSqlString(supplier_size)}')`)
       .join(',\n  ');
-    lines.push(`INSERT OR IGNORE INTO suppliers (supplier_rut, supplier_name, supplier_size) VALUES\n  ${values};`);
+    lines.push(`INSERT OR IGNORE INTO suppliers (rut, name, size) VALUES\n  ${values};`);
   }
 
   return lines.join('\n\n');

@@ -19,7 +19,7 @@ interface PurchaseRow {
   is_expensive: string;
   price_excess_amount: string;
   price_excess_percentage: string;
-  onu_code: string;
+  item_id: string;
 }
 
 interface PurchaseData {
@@ -34,7 +34,7 @@ interface PurchaseData {
     is_expensive: boolean;
     price_excess_amount: number;
     price_excess_percentage: number;
-    onu_code: string;
+    item_id: number;
   }>;
 }
 
@@ -58,7 +58,7 @@ function parseCsv(filePath: string): PurchaseRow[] {
       is_expensive: parts[7],
       price_excess_amount: parts[8],
       price_excess_percentage: parts[9],
-      onu_code: parts[10],
+      item_id: parts[10],
     };
   });
 }
@@ -75,7 +75,7 @@ function extractPurchaseData(rows: PurchaseRow[]): PurchaseData {
     is_expensive: boolean;
     price_excess_amount: number;
     price_excess_percentage: number;
-    onu_code: string;
+    item_id: number;
   }>();
 
   for (const row of rows) {
@@ -95,7 +95,7 @@ function extractPurchaseData(rows: PurchaseRow[]): PurchaseData {
       is_expensive: row.is_expensive.toLowerCase() === 'true',
       price_excess_amount: parseFloat(row.price_excess_amount),
       price_excess_percentage: parseFloat(row.price_excess_percentage),
-      onu_code: row.onu_code,
+      item_id: row.item_id,
     });
   }
 
@@ -116,10 +116,10 @@ function generateSqlInserts(data: PurchaseData, batchSize: number = 500): string
   for (let i = 0; i < purchaseEntries.length; i += batchSize) {
     const batch = purchaseEntries.slice(i, i + batchSize);
     const values = batch
-      .map(([, { purchase_id, purchase_code, municipality_id, supplier_rut, commodity_code, item_quantity, unit_total_price, is_expensive, price_excess_amount, price_excess_percentage, onu_code }]) => 
-        `(${purchase_id}, '${escapeSqlString(purchase_code)}', ${municipality_id}, '${escapeSqlString(supplier_rut)}', '${escapeSqlString(commodity_code)}', ${item_quantity}, ${unit_total_price}, ${is_expensive ? 1 : 0}, ${price_excess_amount}, ${price_excess_percentage}, '${escapeSqlString(onu_code)}')`)
+      .map(([, { purchase_id, purchase_code, municipality_id, supplier_rut, commodity_code, item_quantity, unit_total_price, is_expensive, price_excess_amount, price_excess_percentage, item_id }]) => 
+        `(${purchase_id}, '${escapeSqlString(purchase_code)}', ${municipality_id}, '${escapeSqlString(supplier_rut)}', '${escapeSqlString(commodity_code)}', ${item_quantity}, ${unit_total_price}, ${is_expensive ? 1 : 0}, ${price_excess_amount}, ${price_excess_percentage}, ${item_id})`)
       .join(',\n  ');
-    lines.push(`INSERT OR IGNORE INTO purchases (purchase_id, purchase_code, municipality_id, supplier_rut, commodity_code, item_quantity, unit_total_price, is_expensive, price_excess_amount, price_excess_percentage, onu_code) VALUES\n  ${values};`);
+    lines.push(`INSERT OR IGNORE INTO purchases (purchase_id, purchase_code, municipality_id, supplier_rut, commodity_code, item_quantity, unit_total_price, is_expensive, price_excess_amount, price_excess_percentage, item_id) VALUES\n  ${values};`);
   }
 
   return lines.join('\n\n');
