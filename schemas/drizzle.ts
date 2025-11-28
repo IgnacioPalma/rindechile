@@ -1,6 +1,9 @@
 import { text, integer, real, sqliteTable, primaryKey } from "drizzle-orm/sqlite-core";
 
+// 
 // UNSPSC Tables
+//
+
 export const categories = sqliteTable("categories", {
   id: integer("id").primaryKey(),
   name: text("name").notNull(),
@@ -38,58 +41,69 @@ export const commodities = sqliteTable("commodities", {
   name: text("name").notNull(),
 });
 
-// Data Tables -MAIRA EXTRA
+// 
+// Regions & Municipalities Tables
+//
+
 export const regions = sqliteTable("regions", {
-  region_id: integer("region_id").primaryKey(),
-  region_name: text("region_name").notNull(),
+  id: integer("id").primaryKey(),
+  name: text("name").notNull(),
 });
-
-
 
 export const municipalities = sqliteTable("municipalities", {
-  municipality_id: integer("municipality_id").primaryKey(),
-  municipality_name: text("municipality_name").notNull(),
-  budget: real("budget"),
-  budget_per_capita: real("budget_per_capita"),
+  id: integer("id").primaryKey(),
   region_id: integer("region_id")
     .notNull()
-    .references(() => regions.region_id),
+    .references(() => regions.id),
+  name: text("name").notNull(),
+  budget: real("budget"),
+  budget_per_capita: real("budget_per_capita"),
 });
 
+// 
+// Item Table
+//
+
 export const items = sqliteTable("items", {
-  onu_code: text("onu_code").primaryKey(),
+  id: integer("id").primaryKey(),
   commodity_id: integer("commodity_id")
     .references(() => commodities.id),
   expected_min_range: integer("expected_min_range"),
   expected_max_range: integer("expected_max_range"),
   max_acceptable_price: real("max_acceptable_price"),
-  commodity_code: text("commodity_code"),
-  item_name: text("item_name").notNull(),
-  sufficient_data: integer("sufficient_data").notNull(), // boolean as 0/1
+  name: text("name").notNull(),
+  has_sufficient_data: integer("has_sufficient_data").notNull(), // boolean as 0/1
 });
+
+// 
+// Supplier Table
+//
 
 export const suppliers = sqliteTable("suppliers", {
-  supplier_rut: text("supplier_rut").primaryKey(),
-  supplier_name: text("supplier_name"),
-  supplier_size: text("supplier_size"),
+  rut: text("rut").primaryKey(),
+  name: text("name"),
+  size: text("size"),
 });
 
+// 
+// Purchases Tables
+//
+
 export const purchases = sqliteTable("purchases", {
-  purchase_id: integer("purchase_id").primaryKey(),
-  purchase_code: text("purchase_code").notNull(),
+  id: integer("id").primaryKey(),
+  item_id: integer("item_id")
+    .notNull()
+    .references(() => items.id),
   municipality_id: integer("municipality_id")
     .notNull()
-    .references(() => municipalities.municipality_id),
+    .references(() => municipalities.id),
   supplier_rut: text("supplier_rut")
     .notNull()
-    .references(() => suppliers.supplier_rut),
-  commodity_code: text("commodity_code"),
-  item_quantity: integer("item_quantity").notNull(),
+    .references(() => suppliers.rut),
+  quantity: integer("quantity").notNull(),
   unit_total_price: real("unit_total_price"),
   is_expensive: integer("is_expensive"), 
   price_excess_amount: real("price_excess_amount"),
   price_excess_percentage: real("price_excess_percentage"),
-  onu_code: text("onu_code")
-    .notNull()
-    .references(() => items.onu_code),
+  chilecompra_code: text("chilecompra_code").notNull(),
 });
