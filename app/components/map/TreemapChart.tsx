@@ -1,17 +1,22 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import * as d3 from 'd3';
 import type { TreemapNode, TreemapHierarchy } from '@/types/map';
 import { useFormatters } from '@/app/lib/hooks/useFormatters';
+import { getTreemapData } from '@/app/lib/data-service';
 
 interface TreemapChartProps {
   data: TreemapHierarchy;
+  level: 'country' | 'region' | 'municipality';
+  code?: string;
 }
 
 interface BreadcrumbItem {
   name: string;
-  node?: TreemapNode;
+  categoryId?: number;
+  segmentId?: number;
+  familyId?: number;
 }
 
 // Extended type for D3 treemap nodes with layout properties
@@ -22,12 +27,13 @@ interface TreemapLayoutNode extends d3.HierarchyNode<TreemapNode> {
   y1: number;
 }
 
-export function TreemapChart({ data }: TreemapChartProps) {
+export function TreemapChart({ data: initialData, level, code }: TreemapChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [currentNode, setCurrentNode] = useState<TreemapNode | null>(null);
-  const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([{ name: data.name }]);
+  const [data, setData] = useState<TreemapHierarchy>(initialData);
+  const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([{ name: initialData.name }]);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [loading, setLoading] = useState(false);
   const [tooltipData, setTooltipData] = useState<{
     name: string;
     value: number;
@@ -35,8 +41,14 @@ export function TreemapChart({ data }: TreemapChartProps) {
     x: number;
     y: number;
   } | null>(null);
-  
-  const { formatCurrency, formatPercentage } = useFormatters();
+
+  const { formatCurrency } = useFormatters();
+
+  // Reset data when initialData changes (e.g., user selects different region)
+  useEffect(() => {
+    setData(initialData);
+    setBreadcrumbs([{ name: initialData.name }]);
+  }, [initialData]);
 
   // Update dimensions on mount and resize
   useEffect(() => {
@@ -56,6 +68,100 @@ export function TreemapChart({ data }: TreemapChartProps) {
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
+  // Handle drilling down into a node
+  const handleDrillDown = useCallback(async (node: TreemapNode) => {
+    setLoading(true);
+    try {
+      let newData: TreemapHierarchy | null = null;
+
+      if (node.type === 'category') {
+        // Drill down to segments
+        newData = await getTreemapData(level, code, node.id);
+        if (newData) {
+          setBreadcrumbs(prev => [...prev, { name: node.name, categoryId: node.id }]);
+        }
+      } else if (node.type === 'segment') {
+        // Drill down to families
+        const currentBreadcrumb = breadcrumbs[breadcrumbs.length - 1];
+        newData = await getTreemapData(level, code, currentBreadcrumb.categoryId, node.id);
+        if (newData) {
+          setBreadcrumbs(prev => [...prev, {
+            name: node.name,
+            categoryId: currentBreadcrumb.categoryId,
+            segmentId: node.id
+          }]);
+        }
+      } else if (node.type === 'family') {
+        // Drill down to classes
+        const currentBreadcrumb = breadcrumbs[breadcrumbs.length - 1];
+        newData = await getTreemapData(
+          level,
+          code,
+          currentBreadcrumb.categoryId,
+          currentBreadcrumb.segmentId,
+          node.id
+        );
+        if (newData) {
+          setBreadcrumbs(prev => [...prev, {
+            name: node.name,
+            categoryId: currentBreadcrumb.categoryId,
+            segmentId: currentBreadcrumb.segmentId,
+            familyId: node.id
+          }]);
+        }
+      }
+
+      if (newData) {
+        setData(newData);
+      }
+    } catch (error) {
+      console.error('Failed to drill down:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [level, code, breadcrumbs]);
+
+  // Handle breadcrumb navigation
+  const handleBreadcrumbClick = useCallback(async (index: number) => {
+    if (index === breadcrumbs.length - 1) return; // Already at this level
+
+    setLoading(true);
+    try {
+      const breadcrumb = breadcrumbs[index];
+      let newData: TreemapHierarchy | null = null;
+
+      if (index === 0) {
+        // Go back to categories view
+        newData = await getTreemapData(level, code);
+      } else if (breadcrumb.familyId !== undefined) {
+        // Go to classes view
+        newData = await getTreemapData(
+          level,
+          code,
+          breadcrumb.categoryId,
+          breadcrumb.segmentId,
+          breadcrumb.familyId
+        );
+      } else if (breadcrumb.segmentId !== undefined) {
+        // Go to families view
+        newData = await getTreemapData(level, code, breadcrumb.categoryId, breadcrumb.segmentId);
+      } else if (breadcrumb.categoryId !== undefined) {
+        // Go to segments view
+        newData = await getTreemapData(level, code, breadcrumb.categoryId);
+      }
+
+      if (newData) {
+        setData(newData);
+        setBreadcrumbs(breadcrumbs.slice(0, index + 1));
+      }
+    } catch (error) {
+      console.error('Failed to navigate:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [breadcrumbs, level, code]);
+
+  // Render treemap visualization
   useEffect(() => {
     if (!svgRef.current || !containerRef.current || !data || dimensions.width === 0) return;
 
@@ -72,19 +178,19 @@ export function TreemapChart({ data }: TreemapChartProps) {
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove();
 
-    // Determine which data to display
-    const displayData = currentNode || {
-      id: 'root',
+    // Create root node with children
+    const rootNode: TreemapNode = {
+      id: 0,
       name: data.name,
       value: d3.sum(data.children, d => d.value),
       overpricingRate: 0,
       children: data.children,
-      type: 'segment' as const,
+      type: 'category',
     };
 
     // Create hierarchy
     const root = d3
-      .hierarchy<TreemapNode>(displayData)
+      .hierarchy<TreemapNode>(rootNode)
       .sum(d => d.children ? 0 : d.value) // Only sum leaf nodes
       .sort((a, b) => (b.value || 0) - (a.value || 0));
 
@@ -111,6 +217,10 @@ export function TreemapChart({ data }: TreemapChartProps) {
       .join('g')
       .attr('transform', d => `translate(${d.x0},${d.y0})`);
 
+    // Determine if cells are clickable (categories, segments, and families are clickable)
+    const isClickable = (d: TreemapLayoutNode) =>
+      d.data.type === 'category' || d.data.type === 'segment' || d.data.type === 'family';
+
     // Add rectangles
     cells
       .append('rect')
@@ -119,8 +229,12 @@ export function TreemapChart({ data }: TreemapChartProps) {
       .attr('fill', d => colorScale(d.data.value))
       .attr('stroke', '#fff')
       .attr('stroke-width', 1)
-      .attr('cursor', 'default')
+      .attr('cursor', d => isClickable(d) ? 'pointer' : 'default')
+      .style('transition', 'opacity 0.2s')
       .on('mouseenter', (event, d) => {
+        if (isClickable(d)) {
+          d3.select(event.currentTarget).style('opacity', 0.8);
+        }
         const rect = event.currentTarget.getBoundingClientRect();
         setTooltipData({
           name: d.data.name,
@@ -130,8 +244,14 @@ export function TreemapChart({ data }: TreemapChartProps) {
           y: rect.top - 10,
         });
       })
-      .on('mouseleave', () => {
+      .on('mouseleave', (event) => {
+        d3.select(event.currentTarget).style('opacity', 1);
         setTooltipData(null);
+      })
+      .on('click', (event, d) => {
+        if (isClickable(d)) {
+          handleDrillDown(d.data);
+        }
       });
 
     // Add text labels
@@ -151,28 +271,24 @@ export function TreemapChart({ data }: TreemapChartProps) {
         // Truncate long names
         return name.length > 20 ? name.substring(0, 17) + '...' : name;
       });
-  }, [data, currentNode, dimensions]);
+  }, [data, dimensions, handleDrillDown]);
 
-  const handleDrillDown = (node: TreemapNode) => {
-    setCurrentNode(node);
-    setBreadcrumbs(prev => [...prev, { name: node.name, node }]);
-  };
-
-  const handleBreadcrumbClick = (index: number) => {
-    if (index === 0) {
-      setCurrentNode(null);
-      setBreadcrumbs([{ name: data.name }]);
-    } else {
-      const breadcrumb = breadcrumbs[index];
-      setCurrentNode(breadcrumb.node || null);
-      setBreadcrumbs(breadcrumbs.slice(0, index + 1));
+  // Get helper text based on current level
+  const getHelperText = () => {
+    if (breadcrumbs.length === 1) {
+      return 'Click a category to view segments';
+    } else if (breadcrumbs.length === 2) {
+      return 'Click a segment to view families';
+    } else if (breadcrumbs.length === 3) {
+      return 'Click a family to view classes';
     }
+    return null;
   };
 
   return (
     <div className="relative">
       {/* Breadcrumb Navigation */}
-      <div className="mb-4 flex items-center gap-2 text-sm">
+      <div className="mb-4 flex items-center gap-2 text-sm flex-wrap">
         {breadcrumbs.map((breadcrumb, index) => (
           <div key={index} className="flex items-center gap-2">
             {index > 0 && (
@@ -192,7 +308,7 @@ export function TreemapChart({ data }: TreemapChartProps) {
                   ? 'font-medium text-foreground'
                   : 'text-muted-foreground hover:text-foreground'
               } transition-colors`}
-              disabled={index === breadcrumbs.length - 1}
+              disabled={index === breadcrumbs.length - 1 || loading}
             >
               {breadcrumb.name}
             </button>
@@ -202,6 +318,14 @@ export function TreemapChart({ data }: TreemapChartProps) {
 
       {/* SVG Treemap */}
       <div ref={containerRef} className="relative w-full">
+        {loading && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 rounded-lg">
+            <div className="text-center">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+              <p className="mt-2 text-sm text-muted-foreground">Loading...</p>
+            </div>
+          </div>
+        )}
         <svg
           ref={svgRef}
           className="w-full rounded-lg bg-background border border-border"
@@ -227,12 +351,15 @@ export function TreemapChart({ data }: TreemapChartProps) {
       </div>
 
       {/* Legend */}
-      <div className="mt-4 flex items-center justify-center gap-4 text-xs">
+      <div className="mt-4 flex items-center justify-center gap-4 text-xs flex-wrap">
         <span className="text-muted-foreground">Purchase Amount:</span>
         <div className="flex items-center gap-2">
           <div className="h-4 w-8 rounded" style={{ background: 'linear-gradient(to right, oklch(0.652 0.236 332.23), oklch(0.652 0.236 138.18))' }} />
           <span>Low → High</span>
         </div>
+        {getHelperText() && (
+          <span className="text-muted-foreground ml-4">{getHelperText()}</span>
+        )}
       </div>
     </div>
   );

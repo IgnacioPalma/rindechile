@@ -327,26 +327,41 @@ export async function preloadMunicipalityData(regionCode: number): Promise<void>
  * Fetches treemap data for visualization
  * @param level - 'country', 'region', or 'municipality'
  * @param code - Region ID or municipality ID (required for region/municipality)
+ * @param categoryId - Category ID for drilling down to segments (optional)
+ * @param segmentId - Segment ID for drilling down to families (optional)
+ * @param familyId - Family ID for drilling down to classes (optional)
  */
 export async function getTreemapData(
   level: 'country' | 'region' | 'municipality',
-  code?: string
+  code?: string,
+  categoryId?: number,
+  segmentId?: number,
+  familyId?: number
 ): Promise<TreemapHierarchy | null> {
   try {
     const params = new URLSearchParams({ level });
     if (code) {
       params.append('code', code);
     }
+    if (categoryId !== undefined) {
+      params.append('categoryId', categoryId.toString());
+    }
+    if (segmentId !== undefined) {
+      params.append('segmentId', segmentId.toString());
+    }
+    if (familyId !== undefined) {
+      params.append('familyId', familyId.toString());
+    }
 
     const response = await fetch(`/api/treemap?${params.toString()}`);
-    
+
     if (!response.ok) {
       console.error(`Failed to fetch treemap data: ${response.statusText}`);
       return null;
     }
 
     const result: TreemapResponse = await response.json();
-    
+
     if (!result.success || !result.data) {
       console.error('Treemap API returned unsuccessful response:', result.error);
       return null;
