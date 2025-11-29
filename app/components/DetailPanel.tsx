@@ -11,6 +11,7 @@ import {
 } from '@/app/components/ui/table';
 import { Badge } from '@/app/components/ui/badge';
 import { TreemapChart } from '@/app/components/map/TreemapChart';
+import { TreemapSkeleton } from '@/app/components/map/TreemapSkeleton';
 import { getTreemapData } from '@/app/lib/data-service';
 import type { TreemapHierarchy } from '@/types/map';
 import { useFormatters } from '@/app/lib/hooks/useFormatters';
@@ -139,14 +140,7 @@ export function DetailPanel({ data }: DetailPanelProps) {
       {/* Treemap Visualization */}
       <div className="rounded-lg border border-border p-6 mb-6">
         <h3 className="text-sm font-medium mb-4">Purchase Distribution by Category</h3>
-        {loadingTreemap && (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-              <p className="mt-2 text-sm text-muted-foreground">Loading visualization...</p>
-            </div>
-          </div>
-        )}
+        {loadingTreemap && <TreemapSkeleton />}
         {treemapError && (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">

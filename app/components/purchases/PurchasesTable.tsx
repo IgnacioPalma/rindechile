@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { DataTable } from "./data-table";
 import { columns, type Purchase } from "./columns";
 import { useMapContext } from "../../contexts/MapContext";
+import { PurchasesTableSkeleton } from "./PurchasesTableSkeleton";
 
 export function PurchasesTable() {
   const [data, setData] = useState<Purchase[]>([]);
@@ -76,11 +77,7 @@ export function PurchasesTable() {
   }, [detailPanelData]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">Loading purchases data...</p>
-      </div>
-    );
+    return <PurchasesTableSkeleton />;
   }
 
   if (error) {

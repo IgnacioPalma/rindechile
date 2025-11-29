@@ -4,9 +4,11 @@ import { useMapContext } from "../contexts/MapContext";
 import { DetailPanel } from "./DetailPanel";
 import MapContainerSuspense from "./map/MapContainerSuspense";
 import { PurchasesTable } from "./purchases/PurchasesTable";
+import { DetailPanelSkeleton } from "./DetailPanelSkeleton";
+import { PurchasesTableSkeleton } from "./purchases/PurchasesTableSkeleton";
 
 export function ClientPageContent() {
-  const { detailPanelData } = useMapContext();
+  const { detailPanelData, loading } = useMapContext();
 
   return (
     <main className="w-full">
@@ -14,12 +16,20 @@ export function ClientPageContent() {
         <MapContainerSuspense />
 
         <div className="w-full tablet:w-3/5">
-          <DetailPanel data={detailPanelData} />
+          {loading ? (
+            <DetailPanelSkeleton />
+          ) : (
+            <DetailPanel data={detailPanelData} />
+          )}
         </div>
       </section>
 
       <section className="w-full">
-        <PurchasesTable />
+        {loading ? (
+          <PurchasesTableSkeleton />
+        ) : (
+          <PurchasesTable />
+        )}
       </section>
     </main>
   );
