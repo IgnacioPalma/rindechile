@@ -12,14 +12,14 @@ const instrumentSans = Instrument_Sans({
 
 export const metadata: Metadata = {
   title: "Rinde Chile - Transparencia en Compras Municipales",
-  description: "Plataforma dedicada a monitorear y promover la transparencia en las compras municipales en Chile, facilitando el acceso a información pública y fomentando la participación ciudadana.",
+  description: "Plataforma dedicada a monitorear y promover la transparencia en las compras municipales en Chile.",
   openGraph: {
     type: "website",
     locale: "es_CL",
     url: "https://rindechile.cl",
     siteName: "Rinde Chile",
     title: "Rinde Chile - Transparencia en Compras Municipales",
-    description: "Plataforma dedicada a monitorear y promover la transparencia en las compras municipales en Chile, facilitando el acceso a información pública y fomentando la participación ciudadana.",
+    description: "Plataforma dedicada a monitorear y promover la transparencia en las compras municipales en Chile.",
     images: [
       {
         url: "/opengraph.png",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Rinde Chile - Transparencia en Compras Municipales",
-    description: "Plataforma dedicada a monitorear y promover la transparencia en las compras municipales en Chile, facilitando el acceso a información pública y fomentando la participación ciudadana.",
+    description: "Plataforma dedicada a monitorear y promover la transparencia en las compras municipales en Chile.",
     images: ["/opengraph.png"],
   },
 };
