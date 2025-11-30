@@ -11,7 +11,7 @@ export function ClientPageContent() {
   const { detailPanelData, loading } = useMapContext();
 
   return (
-    <main className="w-full">
+    <main className="flex flex-col gap-8 w-full">
       <section className="flex flex-col tablet:flex-row w-full gap-8">
         <MapContainerSuspense />
 

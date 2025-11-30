@@ -44,13 +44,13 @@ export function TableCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[250px] justify-between"
+          className="w-full justify-between rounded-xl"
         >
           {value || placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[250px] p-0">
+      <PopoverContent className="p-0" align="start">
         <Command>
           <CommandInput placeholder={searchPlaceholder} />
           <CommandList>
@@ -71,7 +71,7 @@ export function TableCombobox({
                       value === "" ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  Clear filter
+                  Limpiar Filtro
                 </CommandItem>
               )}
               {options.map((option) => (

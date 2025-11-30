@@ -112,26 +112,7 @@ export function PurchasesTable() {
     );
   }
 
-  // Build title based on current view
-  const getTitle = () => {
-    if (!detailPanelData) return 'Purchases - Chile';
-
-    switch (detailPanelData.level) {
-      case 'country':
-        return 'Purchases - Chile';
-      case 'region':
-        return `Purchases - ${detailPanelData.name}`;
-      case 'municipality':
-        return `Purchases - ${detailPanelData.name}, ${detailPanelData.regionName}`;
-      default:
-        return 'Purchases';
-    }
-  };
-
   return (
-    <div className="container mx-auto py-10">
-      <h2 className="text-xl font-bold mb-4">{getTitle()}</h2>
-      <DataTable columns={columns} data={data} filterOptions={filterOptions} />
-    </div>
+    <DataTable columns={columns} data={data} filterOptions={filterOptions} />
   );
 }

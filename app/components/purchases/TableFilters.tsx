@@ -32,13 +32,13 @@ export function TableFilters<TData>({
   return (
     <Collapsible open={isOpen} onOpenChange={onOpenChange} className="space-y-2">
       <CollapsibleTrigger asChild>
-        <div className="flex items-center justify-between cursor-pointer hover:bg-muted/50 rounded-md p-2 -mx-2 transition-colors">
+        <div className="bg-card flex items-center justify-between cursor-pointer hover:bg-muted/50 rounded-xl border border-border px-4 py-3 transition-colors">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-semibold">
-              Filters
+              Filtros
               {hasActiveFilters && (
                 <span className="ml-2 text-xs font-normal text-muted-foreground">
-                  ({columnFilters.length} active)
+                  ({columnFilters.length} activos)
                 </span>
               )}
             </h3>
@@ -52,26 +52,26 @@ export function TableFilters<TData>({
                 }}
                 className="h-8 px-2 lg:px-3"
               >
-                Clear all
+                Borrar todo
                 <X className="ml-2 h-4 w-4" />
               </Button>
             )}
           </div>
           <ChevronsUpDown className="h-4 w-4 shrink-0" />
-          <span className="sr-only">Toggle filters</span>
+          <span className="sr-only">Alternar filtros</span>
         </div>
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-2">
-        <div className="flex items-center gap-4 flex-wrap">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TableCombobox
             options={filterOptions.items}
             value={(table.getColumn("item_name")?.getFilterValue() as string) ?? ""}
             onValueChange={(value) =>
               table.getColumn("item_name")?.setFilterValue(value)
             }
-            placeholder="Filter by item..."
-            searchPlaceholder="Search items..."
-            emptyText="No item found."
+            placeholder="Filtrar por ítem..."
+            searchPlaceholder="Buscar ítems..."
+            emptyText="No se encontraron ítems."
           />
           <TableCombobox
             options={filterOptions.municipalities}
@@ -79,9 +79,9 @@ export function TableFilters<TData>({
             onValueChange={(value) =>
               table.getColumn("municipality_name")?.setFilterValue(value)
             }
-            placeholder="Filter by municipality..."
-            searchPlaceholder="Search municipalities..."
-            emptyText="No municipality found."
+            placeholder="Filtrar por municipio..."
+            searchPlaceholder="Buscar municipios..."
+            emptyText="No se encontraron municipios."
           />
         </div>
       </CollapsibleContent>
