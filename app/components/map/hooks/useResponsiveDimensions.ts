@@ -10,7 +10,7 @@ export function useResponsiveDimensions(containerRef: RefObject<HTMLDivElement |
       if (containerRef.current) {
         const width = containerRef.current.clientWidth;
         // Responsive height based on screen size
-        const height = window.innerWidth < 640 ? 300 : window.innerWidth < 1024 ? 350 : 400;
+        const height = window.innerWidth < 640 ? 300 : window.innerWidth < 1024 ? 350 : 300;
         setDimensions({ width, height });
       }
     };

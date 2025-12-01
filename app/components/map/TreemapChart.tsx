@@ -64,7 +64,7 @@ export function TreemapChart({ data: initialData, level, code }: TreemapChartPro
       {/* SVG Treemap */}
       <div ref={containerRef} className="relative w-full">
         {loading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 rounded-lg">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-card rounded-lg">
             <div className="text-center">
               <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" />
               <p className="mt-2 text-sm text-muted-foreground">Cargando...</p>
@@ -73,8 +73,8 @@ export function TreemapChart({ data: initialData, level, code }: TreemapChartPro
         )}
         <svg
           ref={svgRef}
-          className="w-full rounded-lg bg-background border border-border"
-          style={{ height: dimensions.height || 400 }}
+          className="w-full rounded-lg bg-card border border-border"
+          style={{ height: dimensions.height || 200 }}
         />
 
         {/* Tooltip */}
