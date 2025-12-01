@@ -11,11 +11,11 @@ import type {
 import {
   loadRegionsGeoJSON,
   enrichRegionData,
-  getRegionOverpricingRange,
   loadMunicipalitiesGeoJSON,
   enrichMunicipalityData,
   getCountryData,
   getRegionDataByCode,
+  getBudgetData,
 } from '@/app/lib/data-service';
 import { useMapNavigation } from '@/app/components/map/hooks/useMapNavigation';
 import { useAriaLive } from '@/app/components/map/hooks/useAriaLive';
@@ -29,12 +29,14 @@ export type DetailPanelData =
         compras_caras: number;
         compras_totales: number;
       };
+      budget: number | null;
     }
   | {
       level: 'region';
       name: string;
       regionId: string;
       data: RegionData;
+      budget: number | null;
     }
   | {
       level: 'municipality';
@@ -42,6 +44,8 @@ export type DetailPanelData =
       regionName: string;
       municipalityId: number;
       data: MunicipalityData;
+      budget: number | null;
+      budgetPerCapita: number | null;
     }
   | null;
 
@@ -86,6 +90,10 @@ export function MapProvider({
   const [loadingMunicipalities, setLoadingMunicipalities] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nationalAverage, setNationalAverage] = useState<number | undefined>(undefined);
+  const [budgetData, setBudgetData] = useState<{
+    budget: number | null;
+    budgetPerCapita?: number | null;
+  }>({ budget: null });
 
   // Accessibility
   const { message: ariaLiveMessage, announce } = useAriaLive();
@@ -160,6 +168,32 @@ export function MapProvider({
     loadMunicipalities();
   }, [viewState.level, viewState.selectedRegion]);
 
+  // Fetch budget data when view state changes
+  useEffect(() => {
+    async function fetchBudget() {
+      let budgetInfo: { budget: number | null; budgetPerCapita?: number | null };
+
+      // Check for municipality first (since selectedMunicipality can be set while level is still 'region')
+      if (viewState.selectedMunicipality && selectedMunicipalityData) {
+        budgetInfo = await getBudgetData(
+          'municipality',
+          selectedMunicipalityData.municipalityId.toString()
+        );
+      } else if (viewState.level === 'country') {
+        budgetInfo = await getBudgetData('country');
+      } else if (viewState.level === 'region' && viewState.selectedRegion) {
+        const regionCode = viewState.selectedRegion.properties.codregion;
+        budgetInfo = await getBudgetData('region', regionCode.toString());
+      } else {
+        budgetInfo = { budget: null };
+      }
+
+      setBudgetData(budgetInfo);
+    }
+
+    fetchBudget();
+  }, [viewState.level, viewState.selectedRegion, viewState.selectedMunicipality, selectedMunicipalityData]);
+
   // Calculate detail panel data based on view state
   const detailPanelData: DetailPanelData = (() => {
     if (viewState.level === 'country') {
@@ -168,14 +202,15 @@ export function MapProvider({
         level: 'country',
         name: 'Chile',
         data: countryData,
+        budget: budgetData.budget,
       };
     }
-    
+
     if (viewState.level === 'region' && viewState.selectedRegion) {
       const regionCode = viewState.selectedRegion.properties.codregion;
       const regionData = getRegionDataByCode(regionCode);
       const regionName = viewState.selectedRegion.properties.Region;
-      
+
       // If municipality is selected, show municipality data
       if (viewState.selectedMunicipality && selectedMunicipalityData?.data) {
         return {
@@ -184,9 +219,11 @@ export function MapProvider({
           regionName: selectedMunicipalityData.regionName,
           municipalityId: selectedMunicipalityData.municipalityId,
           data: selectedMunicipalityData.data,
+          budget: budgetData.budget,
+          budgetPerCapita: budgetData.budgetPerCapita ?? null,
         };
       }
-      
+
       // Otherwise show region data
       if (regionData) {
         return {
@@ -194,10 +231,11 @@ export function MapProvider({
           name: regionName,
           regionId: regionCode.toString(),
           data: regionData,
+          budget: budgetData.budget,
         };
       }
     }
-    
+
     return null;
   })();
 

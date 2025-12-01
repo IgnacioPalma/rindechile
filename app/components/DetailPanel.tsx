@@ -1,14 +1,6 @@
 'use client';
 
 import type { DetailPanelData } from '@/app/contexts/MapContext';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/app/components/ui/table';
 import { Badge } from '@/app/components/ui/badge';
 import { TreemapChart } from '@/app/components/map/TreemapChart';
 import { TreemapSkeleton } from '@/app/components/map/TreemapSkeleton';
@@ -23,7 +15,7 @@ interface DetailPanelProps {
 }
 
 export function DetailPanel({ data }: DetailPanelProps) {
-  const { formatNumber, formatPercentage } = useFormatters();
+  const { formatNumber, formatPercentage, formatCurrency } = useFormatters();
   
   // Fetch initial treemap data when detail panel data changes
   const {
@@ -81,10 +73,10 @@ export function DetailPanel({ data }: DetailPanelProps) {
             />
           </svg>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Select a region or municipality
+            Selecciona una región en el mapa
           </h3>
           <p className="text-sm text-gray-500">
-            Click on the map to view detailed overpricing data
+            Haz clic en el mapa para ver datos detallados de sobreprecio
           </p>
         </div>
       </div>
@@ -137,6 +129,33 @@ export function DetailPanel({ data }: DetailPanelProps) {
         </div>
       </div>
 
+      {/* Budget Card */}
+      <div className="rounded-lg p-6 border border-border mb-6">
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground mb-2">
+            {data.level === 'country' ? 'Presupuesto Nacional' :
+             data.level === 'region' ? 'Presupuesto Regional' :
+             'Presupuesto Municipal'}
+          </p>
+          {data.budget !== null ? (
+            <>
+              <p className="text-4xl font-bold">
+                {formatCurrency(data.budget)}
+              </p>
+              {data.level === 'municipality' && data.budgetPerCapita !== null && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  {formatCurrency(data.budgetPerCapita)} per cápita
+                </p>
+              )}
+            </>
+          ) : (
+            <p className="text-2xl text-muted-foreground">
+              No disponible
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* Treemap Visualization */}
       <div className="rounded-lg border border-border p-6 mb-6">
         <h3 className="text-md font-medium mb-4">Distribución de gasto por categoría</h3>
@@ -170,7 +189,7 @@ export function DetailPanel({ data }: DetailPanelProps) {
         )}
         {!loadingTreemap && !treemapError && !treemapData && (
           <div className="text-center py-12">
-            <p className="text-sm text-muted-foreground">No data available</p>
+            <p className="text-sm text-muted-foreground">No hay datos disponibles</p>
           </div>
         )}
       </div>

@@ -374,3 +374,54 @@ export async function getTreemapData(
   }
 }
 
+/**
+ * Budget response types
+ */
+interface BudgetResponse {
+  success: boolean;
+  data?: {
+    budget: number | null;
+    budget_per_capita?: number | null;
+  };
+  error?: string;
+}
+
+/**
+ * Fetches budget data for a specific level and code
+ * @param level - 'country', 'region', or 'municipality'
+ * @param code - Region ID or municipality ID (required for region/municipality)
+ */
+export async function getBudgetData(
+  level: 'country' | 'region' | 'municipality',
+  code?: string
+): Promise<{ budget: number | null; budgetPerCapita?: number | null }> {
+  try {
+    const params = new URLSearchParams({ level });
+    if (code) {
+      params.append('code', code);
+    }
+
+    const response = await fetch(`/api/budget?${params.toString()}`);
+
+    if (!response.ok) {
+      console.error(`Failed to fetch budget data: ${response.statusText}`);
+      return { budget: null };
+    }
+
+    const result: BudgetResponse = await response.json();
+
+    if (!result.success || !result.data) {
+      console.error('Budget API returned unsuccessful response:', result.error);
+      return { budget: null };
+    }
+
+    return {
+      budget: result.data.budget,
+      budgetPerCapita: result.data.budget_per_capita,
+    };
+  } catch (error) {
+    console.error('Error fetching budget data:', error);
+    return { budget: null };
+  }
+}
+
