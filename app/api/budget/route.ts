@@ -9,6 +9,14 @@ export const runtime = 'edge';
 export async function GET(request: NextRequest) {
   try {
     const { env } = getCloudflareContext();
+
+    if (!env.DB) {
+      return NextResponse.json(
+        { success: false, error: 'Database not available' },
+        { status: 500 }
+      );
+    }
+
     const db = drizzle(env.DB);
 
     const { searchParams } = new URL(request.url);
