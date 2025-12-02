@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import "./styles/globals.css";
 
 import { Instrument_Sans } from "next/font/google";
+import { Info } from "lucide-react";
 
 import { Header } from "./components/navigation/Header";
+import { Alert, AlertDescription } from "./components/ui/alert";
 
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
@@ -46,10 +48,21 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${instrumentSans.variable} flex flex-col antialiased bg-background text-foreground p-6 tablet:p-8 gap-12 tablet:gap-16`}
+        className={`${instrumentSans.variable} flex flex-col antialiased bg-background text-foreground`}
       >
+        {/* Work in Progress Disclaimer */}
+        <Alert className="w-full py-4">
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            Este sitio web está en desarrollo activo. Si te gusta este proyecto, por favor <a href="https://youtu.be/eC48TKl38LY" target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-4 hover:text-primary transition-colors">deja un like en nuestro video de YouTube</a> para apoyarnos.
+          </AlertDescription>
+        </Alert>
+
         <Header />
-        {children}
+
+        <main className="p-6 tablet:p-8 gap-12 tablet:gap-16">
+          {children}
+        </main>
       </body>
     </html>
   );

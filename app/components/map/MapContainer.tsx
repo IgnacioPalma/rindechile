@@ -65,8 +65,8 @@ export function MapContainer() {
     <div className="w-full py-8 tablet:w-2/5 flex flex-col bg-secondary rounded-xl border border-border">
       {/* Header */}
       <div className="px-8">
-        <h2 className="text-xl font-semibold">
-          Compras Anómalas en Chile
+        <h2 className="text-2xl font-semibold max-w-[30rem]">
+          ¿Dónde están las compras públicas que merecen atención?
         </h2>
         <p className="text-sm text-secondary-foreground font-medium max-w-[25rem]">Descúbre las anomalías en las compras públicas a nivel nacional, regional y municipal.</p>
       </div>

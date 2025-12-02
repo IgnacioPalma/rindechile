@@ -134,9 +134,9 @@ export function DetailPanel({ data }: DetailPanelProps) {
       <div className="rounded-lg p-6 border border-border mb-6">
         <div className="text-center">
           <p className="text-sm text-muted-foreground mb-2">
-            {data.level === 'country' ? 'Presupuesto Nacional' :
-             data.level === 'region' ? 'Presupuesto Regional' :
-             'Presupuesto Municipal'}
+            {data.level === 'country' ? 'Gasto Total Nacional' :
+             data.level === 'region' ? 'Gasto Total Regional' :
+             'Gasto Total Municipal'}
           </p>
           {data.budget !== null ? (
             <>
