@@ -16,7 +16,7 @@ export function Footer() {
 
           {/* Links and social */}
           <div className="flex flex-col gap-4 tablet:items-end">
-            <div className="flex flex-wrap gap-4 text-sm">
+            <div className="hidden flex flex-wrap gap-4 text-sm">
               <Link
                 href="/metodologia"
                 className="text-muted-foreground hover:text-foreground transition-colors"

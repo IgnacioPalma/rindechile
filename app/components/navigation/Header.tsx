@@ -60,7 +60,7 @@ export function Header() {
                         <SearchIcon className="size-4" />
                     </Button>
 
-                    <Button size="sm" className="text-xs tablet:text-sm whitespace-nowrap">
+                    <Button size="sm" className="hidden text-xs tablet:text-sm whitespace-nowrap">
                         Metodología
                     </Button>
                 </div>
