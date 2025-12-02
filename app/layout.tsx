@@ -5,7 +5,9 @@ import { Instrument_Sans } from "next/font/google";
 import { Info } from "lucide-react";
 
 import { Header } from "./components/navigation/Header";
+import { Footer } from "./components/navigation/Footer";
 import { Alert, AlertDescription } from "./components/ui/alert";
+import Link from "next/link";
 
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
@@ -48,13 +50,13 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${instrumentSans.variable} flex flex-col antialiased bg-background text-foreground`}
+        className={`${instrumentSans.variable} flex flex-col min-h-screen antialiased bg-background text-foreground`}
       >
         {/* Work in Progress Disclaimer */}
         <Alert className="w-full py-4">
           <Info className="h-4 w-4" />
           <AlertDescription>
-            Este sitio web está en desarrollo activo. Si te gusta este proyecto, por favor <a href="https://youtu.be/eC48TKl38LY" target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-4 hover:text-primary transition-colors">deja un like en nuestro video de YouTube</a> para apoyarnos.
+            Este sitio web está en desarrollo activo. Si te gusta este proyecto, por favor <Link href="https://youtu.be/eC48TKl38LY" target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-4 hover:text-primary transition-colors">deja un like en nuestro video de YouTube</Link> para apoyarnos.
           </AlertDescription>
         </Alert>
 
@@ -63,6 +65,8 @@ export default function RootLayout({
         <main className="p-6 tablet:p-8 gap-12 tablet:gap-16">
           {children}
         </main>
+
+        <Footer />
       </body>
     </html>
   );
