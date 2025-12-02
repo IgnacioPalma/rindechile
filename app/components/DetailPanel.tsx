@@ -124,7 +124,7 @@ export function DetailPanel({ data }: DetailPanelProps) {
       <div className="rounded-lg p-6 border border-border mb-6">
         <div className="text-center">
           <p className="text-sm text-muted-foreground mb-2">Porcentaje de Anomalías</p>
-          <p className="text-4xl font-bold">
+          <p className="text-2xl tablet:text-3xl desktop:text-4xl font-bold">
             {formatPercentage(data.data.porcentaje_sobreprecio)}
           </p>
         </div>
@@ -140,7 +140,7 @@ export function DetailPanel({ data }: DetailPanelProps) {
           </p>
           {data.budget !== null ? (
             <>
-              <p className="text-4xl font-bold">
+              <p className="text-2xl tablet:text-3xl desktop:text-4xl font-bold">
                 {formatCurrency(data.budget)}
               </p>
               {data.level === 'municipality' && data.budgetPerCapita !== null && (
