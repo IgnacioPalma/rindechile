@@ -1241,7 +1241,16 @@ jobs:
 
 ## License
 
-Private project
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) - see the [LICENSE.md](LICENSE.md) file for details.
+
+### What does this mean?
+
+- ✅ You can use, modify, and distribute this software
+- ✅ You can use it for commercial purposes
+- ⚠️ If you modify and deploy this software on a server, you **must** make your modifications publicly available
+- ⚠️ Any derivative work must also be licensed under AGPL-3.0
+
+For more information, see the [GNU AGPL-3.0 license](https://www.gnu.org/licenses/agpl-3.0.html).
 
 ---
 
