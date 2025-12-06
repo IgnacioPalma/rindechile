@@ -52,7 +52,7 @@ export function TablePagination<TData>({ table, onPageChange }: TablePaginationP
     <div className="flex items-center space-x-6 lg:space-x-8">
       {!useServerPagination && (
         <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Rows per page</p>
+          <p className="text-sm font-medium">Filas por página</p>
           <select
             value={pageSize}
             onChange={(e) => table.setPageSize(Number(e.target.value))}
@@ -66,8 +66,8 @@ export function TablePagination<TData>({ table, onPageChange }: TablePaginationP
           </select>
         </div>
       )}
-      <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-        Page {pageIndex + 1} of {pageCount}
+      <div className="flex w-[120px] items-center justify-center text-xs tablet:text-sm font-medium">
+        Página {pageIndex + 1} de {pageCount}
       </div>
       <div className="flex items-center space-x-2">
         <Button

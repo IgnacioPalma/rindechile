@@ -174,9 +174,15 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      {}
       <div className="flex items-center justify-between px-2">
-        <TableStatus table={table} />
+        <TableStatus
+          table={table}
+          serverPagination={useServerMode ? {
+            total: serverPagination.total,
+            page: serverPagination.page,
+            limit: serverPagination.limit,
+          } : undefined}
+        />
         <TablePagination
           table={table}
           onPageChange={useServerMode ? onPageChange : undefined}

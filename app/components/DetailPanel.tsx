@@ -130,8 +130,8 @@ export function DetailPanel({ data }: DetailPanelProps) {
       {/* Summary Card */}
       <div key={`summary-${contentKey}`} className="rounded-lg p-6 border border-border mb-6 animate-fade-in-up animate-stagger-1">
         <div className="text-center">
-          <p className="text-sm text-muted-foreground mb-2">Porcentaje de Anomalías</p>
-          <p className="text-2xl tablet:text-3xl desktop:text-4xl font-bold">
+          <p className="text-xs tablet:text-sm text-muted-foreground mb-2">Porcentaje de Anomalías</p>
+          <p className="text-xl tablet:text-2xl desktop:text-3xl font-bold">
             {formatPercentage(data.data.porcentaje_sobreprecio)}
           </p>
         </div>
@@ -140,14 +140,14 @@ export function DetailPanel({ data }: DetailPanelProps) {
       {/* Budget Card */}
       <div key={`budget-${contentKey}`} className="rounded-lg p-6 border border-border mb-6 animate-fade-in-up animate-stagger-2">
         <div className="text-center">
-          <p className="text-sm text-muted-foreground mb-2">
+          <p className="text-xs tablet:text-sm text-muted-foreground mb-2">
             {data.level === 'country' ? 'Gasto Total Nacional' :
              data.level === 'region' ? 'Gasto Total Regional' :
              'Gasto Total Municipal'}
           </p>
           {data.budget !== null ? (
             <>
-              <p className="text-2xl tablet:text-3xl desktop:text-4xl font-bold">
+              <p className="text-xl tablet:text-2xl desktop:text-3xl font-bold">
                 {formatCurrency(data.budget)}
               </p>
               {data.level === 'municipality' && data.budgetPerCapita !== null && (
