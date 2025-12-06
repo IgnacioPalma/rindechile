@@ -3,9 +3,10 @@
 type ExcessBadgeProps = {
   percentage: number | null;
   maxAcceptablePrice: number | null;
+  variant?: "default" | "compact";
 };
 
-export function ExcessBadge({ percentage, maxAcceptablePrice }: ExcessBadgeProps) {
+export function ExcessBadge({ percentage, maxAcceptablePrice, variant = "default" }: ExcessBadgeProps) {
   // If no percentage or no price range data, show N/A
   if (percentage === null || maxAcceptablePrice === null) {
     return <div className="font-light text-muted-foreground">N/A</div>;
@@ -38,6 +39,15 @@ export function ExcessBadge({ percentage, maxAcceptablePrice }: ExcessBadgeProps
   };
 
   const priceRange = `${formatPrice(maxAcceptablePrice)}`;
+
+  // Compact variant for mobile cards - only shows the badge with "Exceso:" prefix
+  if (variant === "compact") {
+    return (
+      <div className={`inline-flex items-center justify-center rounded-md px-2 py-1 text-xs font-medium ${colorClass}`}>
+        Exceso: +{percentage.toFixed(1)}%
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-1">

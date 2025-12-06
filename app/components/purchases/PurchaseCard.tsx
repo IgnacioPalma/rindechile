@@ -2,6 +2,7 @@
 
 import type { Purchase } from "./columns";
 import { ExcessBadge } from "./ExcessBadge";
+import { PMABadge } from "./PMABadge";
 import { ChevronRight } from "lucide-react";
 
 interface PurchaseCardProps {
@@ -55,18 +56,20 @@ export function PurchaseCard({ purchase, animationDelay = 0 }: PurchaseCardProps
       {/* Header: Item Name + ExcessBadge */}
       <div className="flex flex-row items-start justify-between gap-3 px-4 py-4">
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-base leading-tight line-clamp-2">
+          <p className="font-medium text-base text-wrap max-w-[200px] leading-tight line-clamp-2">
             {toSentenceCase(purchase.item_name)}
           </p>
           <p className="text-sm text-muted-foreground mt-1">
             {purchase.municipality_name}
           </p>
         </div>
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 flex flex-col gap-1 items-end">
           <ExcessBadge
             percentage={purchase.price_excess_percentage}
             maxAcceptablePrice={purchase.max_acceptable_price}
+            variant="compact"
           />
+          <PMABadge maxAcceptablePrice={purchase.max_acceptable_price} />
         </div>
       </div>
 

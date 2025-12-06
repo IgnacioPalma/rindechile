@@ -20,7 +20,7 @@ export function PurchaseCardList({ purchases }: PurchaseCardListProps) {
     <div className="flex flex-col gap-3">
       {purchases.map((purchase, index) => (
         <PurchaseCard
-          key={purchase.chilecompra_code}
+          key={`${purchase.chilecompra_code}-${purchase.item_name}-${index}`}
           purchase={purchase}
           animationDelay={index * 50}
         />
