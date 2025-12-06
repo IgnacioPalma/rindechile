@@ -76,7 +76,7 @@ export function Footer() {
             © {new Date().getFullYear()} RindeChile. Todos los derechos reservados.
           </p>
           <p className="text-xs text-muted-foreground">
-            Hecho con ♥️ en Chile
+            Hecho con ♥ en Chile
           </p>
         </div>
       </div>
