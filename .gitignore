@@ -6,6 +6,9 @@
 /scripts/*.json
 /scripts/sql/
 
+# Wrangler
+wrangler.*
+
 # dependencies
 /node_modules
 /.pnp
