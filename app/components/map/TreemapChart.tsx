@@ -43,6 +43,23 @@ export function TreemapChart({ data: initialData, level, code }: TreemapChartPro
     resetNavigation(initialData);
   }, [initialData, resetNavigation]);
 
+  // Dismiss tooltip when clicking outside the treemap container (mobile fix)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setTooltipData(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
+
   // Render treemap visualization
   useTreemapRenderer({
     svgRef,

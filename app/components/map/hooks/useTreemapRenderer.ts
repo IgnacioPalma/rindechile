@@ -146,6 +146,7 @@ export function useTreemapRenderer({
         onNodeHover(null);
       })
       .on('click', (event, d) => {
+        onNodeHover(null);
         if (isClickable(d as TreemapLayoutNode)) {
           onNodeClick((d as TreemapLayoutNode).data);
         }
