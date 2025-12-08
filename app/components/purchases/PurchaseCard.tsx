@@ -3,7 +3,7 @@
 import type { Purchase } from "./columns";
 import { ExcessBadge } from "./ExcessBadge";
 import { PMABadge } from "./PMABadge";
-import { ChevronRight } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 interface PurchaseCardProps {
   purchase: Purchase;
@@ -94,7 +94,7 @@ export function PurchaseCard({ purchase, animationDelay = 0 }: PurchaseCardProps
         <p className="text-xs text-muted-foreground font-mono">
           ID: {purchase.chilecompra_code}
         </p>
-        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        <ExternalLink className="h-4 w-4 text-muted-foreground" />
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { ExternalLink } from "lucide-react";
 
 import {
   Table,
@@ -145,6 +146,9 @@ export function DataTable<TData, TValue>({
                         )}
                   </TableHead>
                 ))}
+                <TableHead className="w-12" aria-label="Acción">
+                  <span className="sr-only">Acción</span>
+                </TableHead>
               </TableRow>
             ))}
           </TableHeader>
@@ -181,13 +185,16 @@ export function DataTable<TData, TValue>({
                       )}
                     </TableCell>
                   ))}
+                  <TableCell className="w-12">
+                    <ExternalLink className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                  </TableCell>
                 </TableRow>
               );
               })
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={columns.length + 1}
                   className="h-24 text-center"
                 >
                   No se han encontrado datos.
