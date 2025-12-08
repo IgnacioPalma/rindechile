@@ -11,6 +11,26 @@
     white-space: nowrap;
     border-width: 0;
   }
+
+  /* Accessibility - Skip link (hidden until focused) */
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    padding: 8px 16px;
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+    text-decoration: none;
+    font-weight: 500;
+    z-index: 100;
+    transition: top 0.2s ease;
+  }
+
+  .skip-link:focus {
+    top: 0;
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
   
   /* Accessibility - Minimum touch target size (44px × 44px per WCAG) */
   .touch-target {

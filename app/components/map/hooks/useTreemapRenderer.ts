@@ -104,7 +104,18 @@ export function useTreemapRenderer({
       .attr('stroke', '#fff')
       .attr('stroke-width', 1)
       .attr('cursor', d => isClickable(d) ? 'pointer' : 'default')
-      .style('transition', 'opacity 0.2s, filter 0.2s');
+      .attr('tabindex', d => isClickable(d) ? '0' : null)
+      .attr('role', d => isClickable(d) ? 'button' : null)
+      .attr('aria-label', d => {
+        const name = d.data.name;
+        const value = d.data.value.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 });
+        const rate = (d.data.overpricingRate * 100).toFixed(1);
+        return isClickable(d)
+          ? `${name}, ${value}, sobreprecio ${rate}%. Presiona Enter para ver más detalles.`
+          : `${name}, ${value}, sobreprecio ${rate}%.`;
+      })
+      .style('transition', 'opacity 0.2s, filter 0.2s')
+      .style('outline', 'none');
 
     if (shouldAnimate) {
       rects
@@ -121,29 +132,62 @@ export function useTreemapRenderer({
         .attr('height', d => d.y1 - d.y0);
     }
 
+    // Helper function to show hover/focus state
+    const showNodeHighlight = (element: Element, d: TreemapLayoutNode) => {
+      if (isClickable(d)) {
+        d3.select(element)
+          .style('opacity', 0.85)
+          .style('filter', 'brightness(1.1)');
+      }
+      const rect = element.getBoundingClientRect();
+      onNodeHover({
+        name: d.data.name,
+        value: d.data.value,
+        overpricingRate: d.data.overpricingRate,
+        x: rect.left + rect.width / 2,
+        y: rect.top - 10,
+      });
+    };
+
+    // Helper function to hide hover/focus state
+    const hideNodeHighlight = (element: Element) => {
+      d3.select(element)
+        .style('opacity', 1)
+        .style('filter', 'brightness(1)');
+      onNodeHover(null);
+    };
+
     // Add event handlers after animation completes
     cells
       .selectAll('rect')
       .on('mouseenter', (event, d) => {
-        if (isClickable(d as TreemapLayoutNode)) {
-          d3.select(event.currentTarget)
-            .style('opacity', 0.85)
-            .style('filter', 'brightness(1.1)');
-        }
-        const rect = event.currentTarget.getBoundingClientRect();
-        onNodeHover({
-          name: (d as TreemapLayoutNode).data.name,
-          value: (d as TreemapLayoutNode).data.value,
-          overpricingRate: (d as TreemapLayoutNode).data.overpricingRate,
-          x: rect.left + rect.width / 2,
-          y: rect.top - 10,
-        });
+        showNodeHighlight(event.currentTarget, d as TreemapLayoutNode);
       })
       .on('mouseleave', (event) => {
+        hideNodeHighlight(event.currentTarget);
+      })
+      .on('focus', (event, d) => {
+        // Add focus ring styling
         d3.select(event.currentTarget)
-          .style('opacity', 1)
-          .style('filter', 'brightness(1)');
-        onNodeHover(null);
+          .attr('stroke', 'oklch(0.708 0 0)')
+          .attr('stroke-width', 3);
+        showNodeHighlight(event.currentTarget, d as TreemapLayoutNode);
+      })
+      .on('blur', (event) => {
+        // Remove focus ring styling
+        d3.select(event.currentTarget)
+          .attr('stroke', '#fff')
+          .attr('stroke-width', 1);
+        hideNodeHighlight(event.currentTarget);
+      })
+      .on('keydown', (event, d) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onNodeHover(null);
+          if (isClickable(d as TreemapLayoutNode)) {
+            onNodeClick((d as TreemapLayoutNode).data);
+          }
+        }
       })
       .on('click', (event, d) => {
         onNodeHover(null);

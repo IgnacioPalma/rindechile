@@ -42,17 +42,24 @@ export function TableStatus<TData>({ table, serverPagination }: TableStatusProps
   // Format numbers with thousand separators for better readability
   const formatNumber = (num: number) => num.toLocaleString('es-CL');
 
+  const statusText = `Mostrando filas ${formatNumber(startRow)} a ${formatNumber(endRow)} de ${formatNumber(totalRows)} ${totalRows === 1 ? 'compra' : 'compras'}`;
+
   return (
     <div className="flex-1 text-xs tablet:text-sm text-muted-foreground">
+      {/* Screen reader live region */}
+      <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {statusText}
+      </span>
+
       {/* Mobile: Compact format */}
-      <span className="tablet:hidden">
+      <span className="tablet:hidden" aria-hidden="true">
         <span className="font-medium text-foreground">{formatNumber(startRow)}-{formatNumber(endRow)}</span>
         {' '}de{' '}
         <span className="font-medium text-foreground">{formatNumber(totalRows)}</span>
       </span>
 
       {/* Tablet and up: Full format */}
-      <span className="hidden tablet:inline">
+      <span className="hidden tablet:inline" aria-hidden="true">
         Mostrando filas{' '}
         <span className="font-medium text-foreground">{formatNumber(startRow)}</span>
         {' '}a{' '}

@@ -16,6 +16,7 @@ import {
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -126,7 +127,10 @@ export function DataTable<TData, TValue>({
 
       {/* Tablet+: Table View */}
       <div className="hidden tablet:block border border-border rounded-xl">
-        <Table>
+        <Table aria-label="Tabla de compras públicas">
+          <TableCaption className="sr-only">
+            Tabla de compras públicas con posible sobreprecio. Presiona Enter o Espacio en una fila para ver más detalles en ChileCompra.
+          </TableCaption>
 
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -147,15 +151,27 @@ export function DataTable<TData, TValue>({
 
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row) => {
+                const handleRowActivation = () => {
+                  const chilecompraId = (row.original as { chilecompra_code: string }).chilecompra_code;
+                  window.open(`https://buscador.mercadopublico.cl/ordenes-de-compra?keywords=${chilecompraId}`, '_blank');
+                };
+
+                return (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  onClick={() => {
-                    const chilecompraId = (row.original as { chilecompra_code: string }).chilecompra_code;
-                    window.open(`https://buscador.mercadopublico.cl/ordenes-de-compra?keywords=${chilecompraId}`, '_blank');
+                  onClick={handleRowActivation}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleRowActivation();
+                    }
                   }}
-                  className="cursor-pointer hover:bg-muted/50"
+                  tabIndex={0}
+                  role="link"
+                  aria-label={`Ver orden de compra ${(row.original as { chilecompra_code: string }).chilecompra_code} en ChileCompra (abre en nueva pestaña)`}
+                  className="cursor-pointer hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -166,7 +182,8 @@ export function DataTable<TData, TValue>({
                     </TableCell>
                   ))}
                 </TableRow>
-              ))
+              );
+              })
             ) : (
               <TableRow>
                 <TableCell

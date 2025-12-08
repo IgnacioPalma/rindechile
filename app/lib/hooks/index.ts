@@ -1,5 +1,5 @@
 /**
- * Custom hooks for the transparenta-website application
+ * Custom hooks for the rindechile application
  * Centralized exports for easy importing
  */
 

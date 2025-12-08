@@ -149,31 +149,69 @@ export function ChileMap({
         <g className="map-container">
           {/* Render regions when in country view */}
           {viewState.level === 'country' &&
-            regionsData.map((region) => (
-              <path
-                key={region.feature.properties.codregion}
-                d={pathGenerator(region.feature) || ''}
-                fill={getFill(region.averageOverpricing)}
-                stroke={colorStroke}
-                strokeWidth={0.6}
-                className="cursor-pointer transition-all duration-200 hover:opacity-80 hover:stroke-[1.2px]"
-                onClick={() => handleRegionClick(region.feature.properties.codregion.toString())}
-              />
-            ))}
+            regionsData.map((region) => {
+              const regionCode = region.feature.properties.codregion.toString();
+              const regionName = region.feature.properties.Region || `Región ${regionCode}`;
+              const overpricing = region.averageOverpricing;
+              const overpricingText = overpricing !== null && overpricing !== undefined
+                ? `sobreprecio promedio ${(overpricing * 100).toFixed(1)}%`
+                : 'sin datos';
+
+              return (
+                <path
+                  key={regionCode}
+                  d={pathGenerator(region.feature) || ''}
+                  fill={getFill(overpricing)}
+                  stroke={colorStroke}
+                  strokeWidth={0.6}
+                  className="cursor-pointer transition-all duration-200 hover:opacity-80 hover:stroke-[1.2px] focus:outline-none focus:stroke-[2px] focus:opacity-80"
+                  style={{ outline: 'none' }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`${regionName}, ${overpricingText}. Presiona Enter para ver municipalidades.`}
+                  onClick={() => handleRegionClick(regionCode)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleRegionClick(regionCode);
+                    }
+                  }}
+                />
+              );
+            })}
 
           {/* Render municipalities when in region view */}
           {viewState.level === 'region' && !loadingMunicipalities &&
-            municipalitiesData.map((municipality) => (
-              <path
-                key={municipality.feature.properties.cod_comuna}
-                d={pathGenerator(municipality.feature) || ''}
-                fill={getFill(municipality.data?.porcentaje_sobreprecio)}
-                stroke={colorStroke}
-                strokeWidth={0.9}
-                className="cursor-pointer transition-all duration-200 hover:opacity-80 hover:stroke-[1.4px]"
-                onClick={() => handleMunicipalityClick(municipality.feature.properties.cod_comuna.toString())}
-              />
-            ))}
+            municipalitiesData.map((municipality) => {
+              const municipalityCode = municipality.feature.properties.cod_comuna.toString();
+              const municipalityName = municipality.feature.properties.Comuna || `Comuna ${municipalityCode}`;
+              const overpricing = municipality.data?.porcentaje_sobreprecio;
+              const overpricingText = overpricing !== null && overpricing !== undefined
+                ? `sobreprecio ${(overpricing * 100).toFixed(1)}%`
+                : 'sin datos';
+
+              return (
+                <path
+                  key={municipalityCode}
+                  d={pathGenerator(municipality.feature) || ''}
+                  fill={getFill(overpricing)}
+                  stroke={colorStroke}
+                  strokeWidth={0.9}
+                  className="cursor-pointer transition-all duration-200 hover:opacity-80 hover:stroke-[1.4px] focus:outline-none focus:stroke-[2px] focus:opacity-80"
+                  style={{ outline: 'none' }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`${municipalityName}, ${overpricingText}. Presiona Enter para ver detalles.`}
+                  onClick={() => handleMunicipalityClick(municipalityCode)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleMunicipalityClick(municipalityCode);
+                    }
+                  }}
+                />
+              );
+            })}
 
           {/* Loading indicator for municipalities */}
           {viewState.level === 'region' && loadingMunicipalities && (
