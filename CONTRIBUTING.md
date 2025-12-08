@@ -62,7 +62,7 @@ Para proponer nuevas funcionalidades o mejoras:
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/tu-usuario/rinde-chile.git
+git clone https://github.com/IgnacioPalma/rindechile.git
 cd rinde-chile
 
 # Instalar dependencias
