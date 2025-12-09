@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./styles/globals.css";
 
-import { Instrument_Sans } from "next/font/google";
+import { Outfit } from "next/font/google";
 import { Info } from "lucide-react";
 
 import { Header } from "./components/navigation/Header";
@@ -9,10 +9,9 @@ import { Footer } from "./components/navigation/Footer";
 import { Alert, AlertDescription } from "./components/ui/alert";
 import Link from "next/link";
 
-const instrumentSans = Instrument_Sans({
-  variable: "--font-instrument-sans",
+const outfit = Outfit({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  variable: "--font-outfit",
   display: "swap"
 });
 
@@ -52,7 +51,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${instrumentSans.variable} flex flex-col min-h-screen antialiased bg-background text-foreground`}
+        className={`${outfit.variable} flex flex-col min-h-screen antialiased bg-background text-foreground`}
       >
         {/* Skip to main content link for keyboard users */}
         <a href="#main-content" className="skip-link">
