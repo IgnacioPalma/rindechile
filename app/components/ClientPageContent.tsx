@@ -12,10 +12,10 @@ export function ClientPageContent() {
 
   return (
     <main className="flex flex-col gap-8 w-full">
-      <section className="flex flex-col tablet:flex-row w-full gap-8">
+      <section className="flex flex-col w-full gap-8">
         <MapContainerSuspense />
 
-        <div className="w-full tablet:w-3/5">
+        <div className="w-full">
           {loading ? (
             <DetailPanelSkeleton />
           ) : (

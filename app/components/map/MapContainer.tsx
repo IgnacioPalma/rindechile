@@ -62,7 +62,7 @@ export function MapContainer() {
   }
 
   return (
-    <div className="w-full py-8 tablet:w-2/5 flex flex-col bg-secondary rounded-xl border border-border">
+    <div className="w-full py-8 flex flex-col bg-secondary rounded-xl border border-border">
       {/* Header */}
       <div className="px-8">
         <h2 className="text-2xl pb-2 font-semibold max-w-[30rem]">
