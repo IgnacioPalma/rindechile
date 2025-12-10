@@ -4,10 +4,9 @@ import "./styles/globals.css";
 import { Outfit } from "next/font/google";
 
 import { AppSidebar } from "./components/navigation/AppSidebar";
+import { SiteHeader } from "./components/navigation/SiteHeader";
 import { Footer } from "./components/navigation/Footer";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "./components/ui/sidebar";
-import { Separator } from "./components/ui/separator";
-import { DynamicBreadcrumb } from "./components/navigation/DynamicBreadcrumb";
+import { SidebarInset, SidebarProvider } from "./components/ui/sidebar";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -58,27 +57,21 @@ export default function RootLayout({
           Saltar al contenido principal
         </a>
 
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b">
-              <div className="flex items-center gap-2 px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator
-                  orientation="vertical"
-                  className="mr-2 data-[orientation=vertical]:h-4"
-                />
-                <DynamicBreadcrumb />
-              </div>
-            </header>
+        <div className="[--header-height:3.5rem]">
+          <SidebarProvider className="flex flex-col">
+            <SiteHeader />
+            <div className="flex flex-1">
+              <AppSidebar />
+              <SidebarInset>
+                <main id="main-content" className="flex-1 p-6 tablet:p-8" tabIndex={-1}>
+                  {children}
+                </main>
 
-            <main id="main-content" className="flex-1 p-6 tablet:p-8" tabIndex={-1}>
-              {children}
-            </main>
-
-            <Footer />
-          </SidebarInset>
-        </SidebarProvider>
+                <Footer />
+              </SidebarInset>
+            </div>
+          </SidebarProvider>
+        </div>
       </body>
     </html>
   );
