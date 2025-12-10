@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "opennextjs-cloudflare build",
+    "prebuild": "pnpm generate:static-data",
     "start": "next start",
     "lint": "eslint",
     "generate:mapping": "tsx scripts/generate-municipality-mapping.ts",
