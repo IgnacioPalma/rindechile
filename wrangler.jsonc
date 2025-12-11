@@ -6,6 +6,9 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "observability": {
+    "enabled": false
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"

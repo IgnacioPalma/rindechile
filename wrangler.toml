@@ -12,3 +12,6 @@ binding = "DB"
 database_name = "transparenta"
 database_id = "c2d03ab2-b51b-4d73-839c-2f85ba2afecd"
 migrations_dir = ".drizzle-out"
+
+[observability]
+enabled = false
