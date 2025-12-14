@@ -57,6 +57,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "d3": "^7.9.0",
+    "d3-sankey": "^0.12.3",
     "drizzle-kit": "^0.31.7",
     "drizzle-orm": "^0.44.7",
     "framer-motion": "^12.23.26",
@@ -70,6 +71,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/d3": "^7.4.3",
+    "@types/d3-sankey": "^0.12.5",
     "@types/geojson": "^7946.0.16",
     "@types/node": "^20",
     "@types/react": "^19",

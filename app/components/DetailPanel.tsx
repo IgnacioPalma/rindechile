@@ -3,7 +3,7 @@
 import type { DetailPanelData } from '@/app/contexts/MapContext';
 import { Badge } from '@/app/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
-import { TreemapChart } from '@/app/components/map/TreemapChart';
+import { SankeyChart } from '@/app/components/map/SankeyChart';
 import { TreemapSkeleton } from '@/app/components/map/TreemapSkeleton';
 import { getTreemapData } from '@/app/lib/data-service';
 import type { TreemapHierarchy } from '@/types/map';
@@ -39,7 +39,7 @@ export function DetailPanel({ data }: DetailPanelProps) {
     [data]
   );
 
-  // Get level and code for TreemapChart props
+  // Get level and code for SankeyChart props
   const getTreemapProps = () => {
     if (!data) return { level: 'country' as const, code: undefined };
 
@@ -164,10 +164,10 @@ export function DetailPanel({ data }: DetailPanelProps) {
         </div>
       </div>
 
-      {/* Treemap Visualization */}
-      <div key={`treemap-${contentKey}`} className="rounded-lg border border-border p-6 mb-6 animate-fade-in-up animate-stagger-3">
+      {/* Sankey Diagram Visualization */}
+      <div key={`sankey-${contentKey}`} className="rounded-lg border border-border p-6 mb-6 animate-fade-in-up animate-stagger-3">
         <h3 className="text-md font-medium mb-4">¿Dónde se concentra el sobregasto?</h3>
-        <p className="text-xs tablet:text-sm font-light pb-4">Los bloques más grandes indican las categorías con mayor volumen de gasto en compras que pagaron significativamente más que el precio histórico normal.</p>
+        <p className="text-xs tablet:text-sm font-light pb-4">El diagrama muestra el flujo de gasto desde el presupuesto total hacia las categorías. Haz clic para explorar en detalle.</p>
         {loadingTreemap && <TreemapSkeleton />}
         {treemapError && (
           <div className="flex items-center justify-center py-12">
@@ -190,7 +190,7 @@ export function DetailPanel({ data }: DetailPanelProps) {
           </div>
         )}
         {!loadingTreemap && !treemapError && treemapData && (
-          <TreemapChart
+          <SankeyChart
             data={treemapData}
             level={getTreemapProps().level}
             code={getTreemapProps().code}
