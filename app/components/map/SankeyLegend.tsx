@@ -5,13 +5,13 @@ interface SankeyLegendProps {
 export function SankeyLegend({ breadcrumbsLength }: SankeyLegendProps) {
   const getHelperText = () => {
     if (breadcrumbsLength === 1) {
-      return 'Haz clic en una categoría para ver segmentos';
+      return 'Haz clic en una letra para explorar';
     } else if (breadcrumbsLength === 2) {
-      return 'Haz clic en un segmento para ver familias';
+      return 'Haz clic para ver familias';
     } else if (breadcrumbsLength === 3) {
-      return 'Haz clic en una familia para ver clases';
+      return 'Haz clic para ver clases';
     }
-    return 'Nivel final - usa las migas de pan para navegar';
+    return 'Nivel final';
   };
 
   const helperText = getHelperText();

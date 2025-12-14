@@ -52,7 +52,7 @@ export interface SankeyLayoutLink {
   index?: number;
 }
 
-// Tooltip data for Sankey
+// Tooltip data for Sankey (legacy, may be removed)
 export interface SankeyTooltipData {
   type: 'node' | 'link';
   name: string;
@@ -63,4 +63,12 @@ export interface SankeyTooltipData {
   overpricingRate?: number;
   x: number;
   y: number;
+}
+
+// Node legend item for the expandable legend below the chart
+export interface NodeLegendItem {
+  letter: string;
+  name: string;
+  value: number;
+  percentage: number;
 }

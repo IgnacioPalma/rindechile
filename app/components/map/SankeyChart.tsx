@@ -2,13 +2,13 @@
 
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import type { TreemapHierarchy, TreemapNode } from '@/types/map';
-import type { SankeyLayoutNode, SankeyTooltipData } from '@/types/sankey';
+import type { SankeyLayoutNode, NodeLegendItem } from '@/types/sankey';
 import { useTreemapNavigation } from './hooks/useTreemapNavigation';
 import { useSankeyRenderer } from './hooks/useSankeyRenderer';
 import { useResponsiveDimensions } from './hooks/useResponsiveDimensions';
 import { transformToSankeyData } from '@/app/lib/sankey-transform';
 import { SankeyBreadcrumbs } from './SankeyBreadcrumbs';
-import { SankeyTooltip } from './SankeyTooltip';
+import { SankeyNodeLegend } from './SankeyNodeLegend';
 import { SankeyLegend } from './SankeyLegend';
 
 interface SankeyChartProps {
@@ -20,7 +20,10 @@ interface SankeyChartProps {
 export function SankeyChart({ data: initialData, level, code }: SankeyChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [tooltipData, setTooltipData] = useState<SankeyTooltipData | null>(null);
+
+  // Legend state
+  const [legendNodes, setLegendNodes] = useState<NodeLegendItem[]>([]);
+  const [isLegendExpanded, setIsLegendExpanded] = useState(false);
 
   // Custom hooks for navigation and rendering
   const {
@@ -56,27 +59,16 @@ export function SankeyChart({ data: initialData, level, code }: SankeyChartProps
     handleDrillDown(treemapNode);
   }, [handleDrillDown]);
 
-  // Reset data when initialData changes (e.g., user selects different region)
+  // Reset data and legend when initialData changes (e.g., user selects different region)
   useEffect(() => {
     resetNavigation(initialData);
+    setIsLegendExpanded(false);
   }, [initialData, resetNavigation]);
 
-  // Dismiss tooltip when clicking outside the chart container (mobile fix)
+  // Collapse legend when drilling down
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setTooltipData(null);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    document.addEventListener('touchstart', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
-    };
-  }, []);
+    setIsLegendExpanded(false);
+  }, [data]);
 
   // Render Sankey visualization
   useSankeyRenderer({
@@ -84,7 +76,7 @@ export function SankeyChart({ data: initialData, level, code }: SankeyChartProps
     data: sankeyData,
     dimensions,
     onNodeClick: handleNodeClick,
-    onHover: setTooltipData,
+    onNodesRendered: setLegendNodes,
   });
 
   return (
@@ -111,13 +103,17 @@ export function SankeyChart({ data: initialData, level, code }: SankeyChartProps
           className="w-full rounded-lg bg-card border border-border"
           style={{ height: dimensions.height || 200 }}
         />
-
-        {/* Tooltip */}
-        <SankeyTooltip data={tooltipData} />
       </div>
 
-      {/* Legend */}
+      {/* Color Legend */}
       <SankeyLegend breadcrumbsLength={breadcrumbs.length} />
+
+      {/* Node Legend (Expandable) */}
+      <SankeyNodeLegend
+        nodes={legendNodes}
+        isExpanded={isLegendExpanded}
+        onToggle={() => setIsLegendExpanded(!isLegendExpanded)}
+      />
     </div>
   );
 }

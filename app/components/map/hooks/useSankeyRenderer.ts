@@ -7,7 +7,7 @@ import type {
   SankeyLink,
   SankeyLayoutNode,
   SankeyLayoutLink,
-  SankeyTooltipData,
+  NodeLegendItem,
 } from '@/types/sankey';
 import { calculatePercentage } from '@/app/lib/sankey-transform';
 
@@ -16,15 +16,18 @@ interface UseSankeyRendererProps {
   data: SankeyData;
   dimensions: { width: number; height: number };
   onNodeClick: (node: SankeyLayoutNode) => void;
-  onHover: (tooltipData: SankeyTooltipData | null) => void;
+  onNodesRendered: (nodes: NodeLegendItem[]) => void;
 }
+
+// Letters for labeling nodes
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 export function useSankeyRenderer({
   svgRef,
   data,
   dimensions,
   onNodeClick,
-  onHover,
+  onNodesRendered,
 }: UseSankeyRendererProps) {
   // Track the last rendered data to determine if we should animate
   const lastDataRef = useRef<SankeyData | null>(null);
@@ -92,7 +95,7 @@ export function useSankeyRenderer({
       .attr('fill', 'none')
       .attr('stroke', d => {
         const targetColor = colorScale(d.target.value);
-        return d3.color(targetColor)?.copy({ opacity: 0.5 })?.toString() || targetColor;
+        return d3.color(targetColor)?.copy({ opacity: 0.3 })?.toString() || targetColor;
       })
       .attr('stroke-width', d => Math.max(1, d.width))
       .style('cursor', 'default')
@@ -113,32 +116,6 @@ export function useSankeyRenderer({
           .attr('stroke-dashoffset', 0);
       });
     }
-
-    // Link hover handlers
-    linkPaths
-      .on('mouseenter', (event, d) => {
-        d3.select(event.currentTarget)
-          .style('opacity', 0.85)
-          .style('filter', 'brightness(1.2)');
-
-        const rect = (event.currentTarget as Element).getBoundingClientRect();
-        onHover({
-          type: 'link',
-          name: `${d.source.name} → ${d.target.name}`,
-          sourceName: d.source.name,
-          targetName: d.target.name,
-          value: d.value,
-          percentage: calculatePercentage(d.value, totalValue),
-          x: rect.left + rect.width / 2,
-          y: rect.top + rect.height / 2,
-        });
-      })
-      .on('mouseleave', (event) => {
-        d3.select(event.currentTarget)
-          .style('opacity', 1)
-          .style('filter', 'brightness(1)');
-        onHover(null);
-      });
 
     // --- Render Nodes ---
     const nodeGroup = g.append('g').attr('class', 'nodes');
@@ -187,128 +164,104 @@ export function useSankeyRenderer({
       rects.attr('width', d => d.x1 - d.x0);
     }
 
-    // Helper function to show hover/focus state
-    const showNodeHighlight = (element: Element, d: SankeyLayoutNode) => {
-      if (d.isClickable) {
-        d3.select(element)
-          .style('opacity', 0.85)
-          .style('filter', 'brightness(1.1)');
-      }
-      const rect = element.getBoundingClientRect();
-      onHover({
-        type: 'node',
-        name: d.name,
-        value: d.value,
-        percentage: calculatePercentage(d.value, totalValue),
-        overpricingRate: d.overpricingRate,
-        x: rect.left + rect.width / 2,
-        y: rect.top - 10,
-      });
-    };
-
-    // Helper function to hide hover/focus state
-    const hideNodeHighlight = (element: Element) => {
-      d3.select(element)
-        .style('opacity', 1)
-        .style('filter', 'brightness(1)');
-      onHover(null);
-    };
-
-    // Node event handlers
+    // Node event handlers (simplified - no hover tooltips)
     rects
       .on('mouseenter', (event, d) => {
-        showNodeHighlight(event.currentTarget, d as SankeyLayoutNode);
+        const node = d as SankeyLayoutNode;
+        if (node.isClickable) {
+          d3.select(event.currentTarget)
+            .style('opacity', 0.85)
+            .style('filter', 'brightness(1.1)');
+        }
       })
       .on('mouseleave', (event) => {
-        hideNodeHighlight(event.currentTarget);
+        d3.select(event.currentTarget)
+          .style('opacity', 1)
+          .style('filter', 'brightness(1)');
       })
       .on('focus', (event, d) => {
-        // Add focus ring styling
+        const node = d as SankeyLayoutNode;
         d3.select(event.currentTarget)
           .attr('stroke', 'oklch(0.708 0 0)')
           .attr('stroke-width', 3);
-        showNodeHighlight(event.currentTarget, d as SankeyLayoutNode);
+        if (node.isClickable) {
+          d3.select(event.currentTarget)
+            .style('opacity', 0.85)
+            .style('filter', 'brightness(1.1)');
+        }
       })
       .on('blur', (event) => {
-        // Remove focus ring styling
         d3.select(event.currentTarget)
           .attr('stroke', null)
-          .attr('stroke-width', null);
-        hideNodeHighlight(event.currentTarget);
+          .attr('stroke-width', null)
+          .style('opacity', 1)
+          .style('filter', 'brightness(1)');
       })
       .on('keydown', (event, d) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          onHover(null);
           const node = d as SankeyLayoutNode;
           if (node.isClickable) {
             onNodeClick(node);
           }
         }
       })
-      .on('click', (event, d) => {
-        onHover(null);
+      .on('click', (_event, d) => {
         const node = d as SankeyLayoutNode;
         if (node.isClickable) {
           onNodeClick(node);
         }
       });
 
-    // --- Render Labels ---
+    // --- Render Letter Labels on Nodes ---
+    // Assign letters to target nodes (skip source)
+    const targetNodesWithLetters = nodes
+      .filter(n => n.type !== 'source')
+      .map((node, index) => ({
+        node,
+        letter: LETTERS[index] || `${index + 1}`,
+      }));
+
+    // Create legend data for callback
+    const legendItems: NodeLegendItem[] = targetNodesWithLetters.map(({ node, letter }) => ({
+      letter,
+      name: node.name,
+      value: node.value,
+      percentage: calculatePercentage(node.value, totalValue),
+    }));
+
+    // Call the callback with legend data
+    onNodesRendered(legendItems);
+
+    // Render letter labels centered on target nodes
     nodeGroups.each(function (d) {
       const nodeHeight = d.y1 - d.y0;
       const nodeWidth = d.x1 - d.x0;
-      const isLeftSide = d.x0 < width / 2;
 
-      // Only show labels if there's enough vertical space
-      if (nodeHeight < 20) return;
+      // Skip source node
+      if (d.type === 'source') return;
 
-      const textElement = d3.select(this).append('text')
-        .attr('fill', 'currentColor')
-        .attr('font-size', '11px')
-        .attr('font-weight', '500')
+      // Find the letter for this node
+      const letterData = targetNodesWithLetters.find(t => t.node.id === d.id);
+      if (!letterData) return;
+
+      // Render letter centered on the node
+      const letterElement = d3.select(this).append('text')
+        .attr('fill', 'white')
+        .attr('font-size', '12px')
+        .attr('font-weight', '700')
         .attr('pointer-events', 'none')
-        .attr('dy', '0.35em')
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'central')
+        .attr('x', nodeWidth / 2)
         .attr('y', nodeHeight / 2)
-        .style('opacity', shouldAnimate ? 0 : 1);
+        .style('opacity', shouldAnimate ? 0 : 1)
+        .style('text-shadow', '0 1px 2px rgba(0,0,0,0.5)')
+        .text(letterData.letter);
 
-      if (isLeftSide) {
-        // Label on the right of the node
-        textElement
-          .attr('x', nodeWidth + 6)
-          .attr('text-anchor', 'start');
-      } else {
-        // Label on the left of the node
-        textElement
-          .attr('x', -6)
-          .attr('text-anchor', 'end');
-      }
-
-      // Calculate available width for text
-      const availableWidth = isLeftSide
-        ? width - (d.x1 + 6) - 10
-        : d.x0 - 6 - 10;
-
-      // Truncate text if needed
-      let displayText = d.name;
-      const tempSpan = textElement.append('tspan').text(displayText);
-      const textWidth = (tempSpan.node() as SVGTSpanElement).getComputedTextLength();
-
-      if (textWidth > availableWidth) {
-        // Truncate and add ellipsis
-        while (displayText.length > 0 && (tempSpan.node() as SVGTSpanElement).getComputedTextLength() > availableWidth - 15) {
-          displayText = displayText.slice(0, -1);
-          tempSpan.text(displayText + '...');
-        }
-        displayText = displayText + '...';
-      }
-
-      tempSpan.remove();
-      textElement.text(displayText);
-
-      // Animate text fade-in only on data change
+      // Animate letter fade-in only on data change
       if (shouldAnimate) {
-        textElement
+        letterElement
           .transition()
           .duration(400)
           .delay(200)
@@ -320,5 +273,5 @@ export function useSankeyRenderer({
     return () => {
       svg.selectAll('*').remove();
     };
-  }, [data, dimensions, onNodeClick, onHover, svgRef]);
+  }, [data, dimensions, onNodeClick, onNodesRendered, svgRef]);
 }
