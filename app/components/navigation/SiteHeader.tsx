@@ -93,12 +93,12 @@ export function SiteHeader() {
 
             {/* Search Button */}
             <Button
-              variant="outline"
+              variant="ghost"
               className="gap-2"
               onClick={() => setSearchOpen(true)}
             >
               <Search className="size-4 stroke-muted"/>
-              <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-accent px-1.5 font-mono text-[10px] font-medium text-accent-foreground tablet:inline-flex">
+              <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-accent-foreground tablet:inline-flex">
                 <span className="text-xs">⌘</span>K
               </kbd>
             </Button>
