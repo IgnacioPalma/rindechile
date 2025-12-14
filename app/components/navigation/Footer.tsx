@@ -11,16 +11,15 @@ export function Footer() {
           <div className="flex flex-col gap-3">
             <Link 
               href="/" 
-              className="flex flex-row gap-2 tablet:gap-3 items-center w-fit transition-opacity duration-200 hover:opacity-80"
+              className="w-fit transition-opacity duration-200 hover:opacity-80"
             >
               <Image
-                src="/logo.svg"
+                src="/logo-full.svg"
                 alt="Rinde Chile Logo"
-                width={24}
-                height={24}
+                width={128}
+                height={128}
                 className="fill-foreground"
               />
-              <span className="text-base tablet:text-lg font-semibold">Rinde Chile</span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
               Plataforma dedicada a monitorear y promover la transparencia en las compras municipales en Chile.

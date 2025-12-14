@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import "./styles/globals.css";
 
-import { Outfit } from "next/font/google";
+import { Manrope } from "next/font/google";
 
 import { AppSidebar } from "./components/navigation/AppSidebar";
 import { SiteHeader } from "./components/navigation/SiteHeader";
 import { Footer } from "./components/navigation/Footer";
 import { SidebarInset, SidebarProvider } from "./components/ui/sidebar";
 
-const outfit = Outfit({
+const manrope = Manrope({
   subsets: ["latin"],
-  variable: "--font-outfit",
+  variable: "--font-manrope",
   display: "swap"
 });
 
@@ -50,7 +50,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${outfit.variable} antialiased bg-background text-foreground`}
+        className={`${manrope.variable} antialiased bg-background text-foreground`}
       >
         {/* Skip to main content link for keyboard users */}
         <a href="#main-content" className="skip-link">

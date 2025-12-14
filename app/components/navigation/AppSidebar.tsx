@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen } from 'lucide-react';
 
 import {
   Sidebar,
@@ -20,12 +19,10 @@ const navItems = [
   {
     title: 'Inicio',
     url: '/',
-    icon: Home,
   },
   {
     title: 'Metodología',
     url: '/methodology',
-    icon: BookOpen,
   },
 ];
 
@@ -38,7 +35,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <DynamicBreadcrumb />
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="pt-36">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -50,7 +47,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     tooltip={item.title}
                   >
                     <Link href={item.url}>
-                      <item.icon />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
