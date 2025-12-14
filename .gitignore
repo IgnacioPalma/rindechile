@@ -5,6 +5,7 @@
 /scripts/*.sql
 /scripts/*.json
 /scripts/sql/
+/scripts/docs
 
 # dependencies
 /node_modules
