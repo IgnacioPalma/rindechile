@@ -4,6 +4,7 @@ import type { DetailPanelData } from '@/app/contexts/MapContext';
 import { Badge } from '@/app/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
 import { MetricCard } from '@/app/components/ui/metric-card';
+import { AnomaliesAreaChart } from '@/app/components/ui/anomalies-area-chart';
 import { TreemapChart } from '@/app/components/map/TreemapChart';
 import { TreemapSkeleton } from '@/app/components/map/TreemapSkeleton';
 import { getTreemapData } from '@/app/lib/data-service';
@@ -120,12 +121,17 @@ export function DetailPanel({ data }: DetailPanelProps) {
 
       {/* Summary Data*/}
       <div key={`summary-${contentKey}`} className="p-6 border-b animate-fade-in-up animate-stagger-1 shrink-0">
-        <div className="flex flex-col tablet:flex-row justify-between gap-4">
+        <div className="flex flex-col tablet:flex-row justify-between gap-8">
 
-          <MetricCard
-            value={formatPercentage(data.data.porcentaje_sobreprecio)}
-            label="Porcentaje de Anomalías"
-          />
+          <div className='flex flex-col w-full max-w-[48rem] tablet:flex-row gap-8 items-stretch'>
+            <MetricCard
+              value={formatPercentage(data.data.porcentaje_sobreprecio)}
+              label="Porcentaje de Anomalías"
+            />
+            <div className="flex-1 desktop:max-h-22">
+              <AnomaliesAreaChart />
+            </div>
+          </div>
 
           <div className='flex flex-col tablet:flex-row gap-4'>
             <MetricCard
