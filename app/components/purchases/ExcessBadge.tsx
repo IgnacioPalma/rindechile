@@ -22,7 +22,7 @@ export function ExcessBadge({ percentage, maxAcceptablePrice, variant = "default
     } else if (percent <= 50) {
       return "bg-[var(--tier-medio)] text-[var(--tier-bajo)]";
     } else {
-      return "bg-[var(--tier-alto-var)] text-[var(--tier-bajo)]";
+      return "bg-[var(--tier-alto)] text-[var(--tier-bajo)]";
     }
   };
 
