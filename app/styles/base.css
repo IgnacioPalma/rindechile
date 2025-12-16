@@ -4,6 +4,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   }
 }

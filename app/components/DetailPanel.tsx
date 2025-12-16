@@ -3,6 +3,7 @@
 import type { DetailPanelData } from '@/app/contexts/MapContext';
 import { Badge } from '@/app/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card';
+import { MetricCard } from '@/app/components/ui/metric-card';
 import { TreemapChart } from '@/app/components/map/TreemapChart';
 import { TreemapSkeleton } from '@/app/components/map/TreemapSkeleton';
 import { getTreemapData } from '@/app/lib/data-service';
@@ -95,16 +96,6 @@ export function DetailPanel({ data }: DetailPanelProps) {
     return data.name; // municipality
   };
 
-  const getSubtitle = () => {
-    if (data.level === 'country') {
-      return 'Vista Nacional';
-    }
-    if (data.level === 'region') {
-      return 'Vista Regional';
-    }
-    return data.regionName; // municipality shows region name
-  };
-
   // Create a unique key based on the current selection to trigger animations on change
   const contentKey = data.level === 'country'
     ? 'country'
@@ -113,54 +104,54 @@ export function DetailPanel({ data }: DetailPanelProps) {
     : `municipality-${data.municipalityId}`;
 
   return (
-    <div className="h-full overflow-y-auto rounded-lg p-8 border border-border">
+    <div className="h-full overflow-y-auto rounded-lg border border-border">
+
       {/* Header */}
-      <div key={`header-${contentKey}`} className="mb-6 animate-fade-in">
+      <div key={`header-${contentKey}`} className="p-6 animate-fade-in border-b">
         <div className="flex items-start justify-between mb-2">
-          <div className="flex-1">
-            <h2 className="text-xl font-semibold">{getTitle()}</h2>
-            <p className="text-sm text-muted-foreground mt-1">{getSubtitle()}</p>
-          </div>
-          <Badge variant={severityInfo.variant} className="text-sm ml-4 shrink-0">
+
+          <h2 className="text-2xl font-semibold">{getTitle()}</h2>
+
+          <Badge variant={severityInfo.variant} className="text-sm hidden shrink-0">
             {severityInfo.level}
           </Badge>
         </div>
       </div>
 
       {/* Summary Card */}
-      <div key={`summary-${contentKey}`} className="rounded-lg p-6 border border-border mb-6 animate-fade-in-up animate-stagger-1">
-        <div className="text-center">
-          <p className="text-xs tablet:text-sm text-muted-foreground mb-2">Porcentaje de Anomalías</p>
-          <p className="text-xl tablet:text-2xl desktop:text-3xl font-bold">
-            {formatPercentage(data.data.porcentaje_sobreprecio)}
-          </p>
-        </div>
-      </div>
-
-      {/* Budget Card */}
-      <div key={`budget-${contentKey}`} className="rounded-lg p-6 border border-border mb-6 animate-fade-in-up animate-stagger-2">
-        <div className="text-center">
-          <p className="text-xs tablet:text-sm text-muted-foreground mb-2">
-            {data.level === 'country' ? 'Gasto Total Nacional' :
+      <div key={`summary-${contentKey}`} className="p-6 border-b animate-fade-in-up animate-stagger-1">
+        <div className="flex flex-row justify-between">
+          <MetricCard
+            value={formatPercentage(data.data.porcentaje_sobreprecio)}
+            label="Porcentaje de Anomalías"
+          />
+          <div className='flex flex-row gap-4 items-end'>
+            {data.budget !== null ? (
+              <>
+              <MetricCard
+                variant="ghost"
+                value={formatCurrency(data.budget)}
+                label= {data.level === 'country' ? 'Gasto Total Nacional' :
              data.level === 'region' ? 'Gasto Total Regional' :
              'Gasto Total Municipal'}
-          </p>
-          {data.budget !== null ? (
-            <>
-              <p className="text-xl tablet:text-2xl desktop:text-3xl font-bold">
-                {formatCurrency(data.budget)}
-              </p>
+              />
+
               {data.level === 'municipality' && data.budgetPerCapita !== null && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  {formatCurrency(data.budgetPerCapita)} per cápita
-                </p>
+                <MetricCard
+                  variant="ghost"
+                  value={formatCurrency(data.budgetPerCapita)}
+                  label= "Per Cápita"
+                />
               )}
             </>
-          ) : (
-            <p className="text-2xl text-muted-foreground">
-              No disponible
-            </p>
-          )}
+            ) : (
+              <p className="text-xl italic">
+                El gasto total no está disponible para esta área.
+              </p>
+            )}
+            
+          </div>
+
         </div>
       </div>
 

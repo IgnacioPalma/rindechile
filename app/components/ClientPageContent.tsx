@@ -17,10 +17,10 @@ export function ClientPageContent() {
       <section className="flex flex-col tablet:flex-row w-full h-screen gap-8">
 
         <div className="w-full tablet:w-1/5 flex flex-col gap-4">
-          <section className="p-8 border rounded-lg flex flex-col gap-4">
-            <h1 className="text-2xl font-medium">¿Dónde están las compras públicas que merecen atención?</h1>
+          <section className="p-6 border rounded-lg flex flex-col gap-4">
+            <h1 className="text-2xl font-semibold">¿Dónde están las compras públicas que merecen atención?</h1>
 
-            <p className="text-sm font-light">
+            <p className="text-sm font-regular">
               Descubre dónde se concentran las compras que superan significativamente el rango histórico de precio. 
             </p>
 

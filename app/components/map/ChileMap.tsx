@@ -196,7 +196,7 @@ export function ChileMap({
                   d={pathGenerator(municipality.feature) || ''}
                   fill={getFill(overpricing)}
                   stroke={colorStroke}
-                  strokeWidth={0.9}
+                  strokeWidth={0.5}
                   className="cursor-pointer transition-all duration-200 hover:opacity-80 hover:stroke-[1.4px] focus:outline-none focus:stroke-[2px] focus:opacity-80"
                   style={{ outline: 'none' }}
                   tabIndex={0}
