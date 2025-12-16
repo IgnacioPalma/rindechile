@@ -12,10 +12,28 @@ export function ClientPageContent() {
 
   return (
     <main className="flex flex-col gap-8 w-full">
-      <section className="flex flex-col tablet:flex-row w-full gap-8">
-        <MapContainerSuspense />
 
-        <div className="w-full tablet:w-3/5">
+      {/* Top Section */}
+      <section className="flex flex-col tablet:flex-row w-full h-screen gap-8">
+
+        <div className="w-full tablet:w-1/5 flex flex-col gap-4">
+          <section className="p-8 border rounded-lg flex flex-col gap-4">
+            <h1 className="text-2xl font-medium">¿Dónde están las compras públicas que merecen atención?</h1>
+
+            <p className="text-sm font-light">
+              Descubre dónde se concentran las compras que superan significativamente el rango histórico de precio. 
+            </p>
+
+            <p className="text-sm font-light">
+              Explora a nivel nacional, regional y municipal.
+            </p>
+          </section>
+
+          <MapContainerSuspense />
+
+        </div>
+
+        <div className="w-full tablet:w-4/5">
           {loading ? (
             <DetailPanelSkeleton />
           ) : (
@@ -24,6 +42,7 @@ export function ClientPageContent() {
         </div>
       </section>
 
+      {/* Purchases Table Section */}
       <section className="w-full">
         {loading ? (
           <PurchasesTableSkeleton />

@@ -137,7 +137,7 @@ export function ChileMap({
 
   // Get CSS variable values from document
   const styles = getComputedStyle(document.documentElement);
-  const colorStroke = styles.getPropertyValue('--color-secondary').trim();
+  const colorStroke = styles.getPropertyValue('--color-background').trim();
 
   return (
     <div ref={containerRef} className="relative">

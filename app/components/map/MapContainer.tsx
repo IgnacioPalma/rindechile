@@ -62,17 +62,10 @@ export function MapContainer() {
   }
 
   return (
-    <div className="w-full py-8 tablet:w-2/5 flex flex-col bg-secondary rounded-xl border border-border">
-      {/* Header */}
-      <div className="px-8">
-        <h2 className="text-2xl pb-2 font-semibold max-w-[30rem]">
-          ¿Dónde están las compras públicas que merecen atención?
-        </h2>
-        <p className="text-sm text-secondary-foreground font-medium max-w-[25rem]">Descúbre dónde se concentran las compras que superan significativamente el rango histórico de precio. Explora a nivel nacional, regional y municipal.</p>
-      </div>
+    <div className="w-full flex flex-col rounded-xl border border-border">
 
       {/* Main Content: Map */}
-      <div className="flex-1 overflow-hidden my-8">
+      <div className="flex-1 overflow-hidden">
         <div className="w-full h-full flex flex-col">
           <div className="flex-1 overflow-hidden">
             <ChileMap
@@ -88,10 +81,6 @@ export function MapContainer() {
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="px-8">
-        <MapLegend colorScale={colorScale} nationalAverage={nationalAverage} />
-      </div>
     </div>
   );
 }
