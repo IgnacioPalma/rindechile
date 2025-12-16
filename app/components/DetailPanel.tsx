@@ -189,24 +189,24 @@ export function DetailPanel({ data }: DetailPanelProps) {
       </div>
 
       {/* Legend and Disclaimer */}
-      <div key={`footer-${contentKey}`} className="p-6 border-t animate-fade-in-up animate-stagger-4 flex flex-row justify-between shrink-0">
+      <div key={`footer-${contentKey}`} className="p-6 border-t animate-fade-in-up animate-stagger-4 flex flex-col gap-8 tablet:flex-row justify-between shrink-0">
         <div className='flex flex-col gap-4'>
           <h4 className=''>Porcentaje de compras con sobreprecio</h4>
           <div className='flex flex-row gap-4'>
 
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-2 w-full'>
               <p className='text-xs'>Bajo</p>
-              <div className='h-4 w-32 rounded-xs bg-foreground'></div>
+              <div className='h-4 w-full tablet:w-32 rounded-xs bg-foreground'></div>
             </div>
 
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-2 w-full'>
               <p className='text-xs'>Medio</p>
-              <div className='h-4 w-32 rounded-xs bg-muted'></div>
+              <div className='h-4 w-full tablet:w-32 rounded-xs bg-muted'></div>
             </div>
 
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-2 w-full'>
               <p className='text-xs'>Alto</p>
-              <div className='h-4 w-32 rounded-xs bg-secondary'></div>
+              <div className='h-4 w-full tablet:w-32 rounded-xs bg-secondary'></div>
             </div>
           </div>
         </div>
