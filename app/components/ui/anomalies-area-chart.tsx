@@ -30,15 +30,9 @@ export function AnomaliesAreaChart() {
       <AreaChart
         accessibilityLayer
         data={chartData}
-        margin={{top: 6, bottom: 6, left: 12, right: 12}}
+        margin={{top: 6, bottom: 6, left: 0, right: 0}}
       >
         <CartesianGrid vertical={false} />
-        <XAxis
-          dataKey="month"
-          tickLine={false}
-          axisLine={false}
-          tickMargin={4}
-        />
         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
         <defs>
           <linearGradient id="fillAnomalies" x1="0" y1="0" x2="0" y2="1">
