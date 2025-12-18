@@ -1,90 +1,118 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/app/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/app/components/ui/collapsible";
-import { ChevronsUpDown, X } from "lucide-react";
+import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { TableCombobox } from "./TableCombobox";
-import type { Table } from "@tanstack/react-table";
+import { SmartSearch } from "./SmartSearch";
+import { MobileSortSheet, type SortingState } from "./MobileSortSheet";
+import { FilterChips } from "./FilterChips";
 import type { FilterOptions } from "./PurchasesTable";
 
-interface TableFiltersProps<TData> {
-  table: Table<TData>;
+interface TableFiltersProps {
+  search: string | null;
+  municipalityName: string | null;
+  sorting: SortingState;
   filterOptions: FilterOptions;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
+  onSearchChange: (value: string | null) => void;
+  onMunicipalityChange: (value: string | null) => void;
+  onSortChange: (sort: SortingState) => void;
+  onClearAll: () => void;
 }
 
-export function TableFilters<TData>({
-  table,
+export function TableFilters({
+  search,
+  municipalityName,
+  sorting,
   filterOptions,
-  isOpen,
-  onOpenChange,
-}: TableFiltersProps<TData>) {
-  const columnFilters = table.getState().columnFilters;
-  const hasActiveFilters = columnFilters.length > 0;
-
-  const clearAllFilters = () => {
-    table.setColumnFilters([]);
-  };
+  onSearchChange,
+  onMunicipalityChange,
+  onSortChange,
+  onClearAll,
+}: TableFiltersProps) {
+  const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
+  const [isMoreFiltersOpen, setIsMoreFiltersOpen] = useState(false);
 
   return (
-    <Collapsible open={isOpen} onOpenChange={onOpenChange} className="space-y-2">
-      <CollapsibleTrigger asChild>
-        <div className="bg-card flex items-center justify-between cursor-pointer hover:bg-muted/50 rounded-lg border border-border px-4 py-3 transition-colors">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold">
-              Filtros
-              {hasActiveFilters && (
-                <span className="ml-2 text-xs font-normal text-muted-foreground">
-                  ({columnFilters.length} activos)
-                </span>
-              )}
-            </h3>
-            {hasActiveFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  clearAllFilters();
-                }}
-                className="h-8 px-2 lg:px-3"
-              >
-                Borrar todo
-                <X className="ml-2 h-4 w-4" />
-              </Button>
-            )}
-          </div>
-          <ChevronsUpDown className="h-4 w-4 shrink-0" />
-          <span className="sr-only">Alternar filtros</span>
-        </div>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="space-y-2">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <TableCombobox
-            options={filterOptions.items}
-            value={(table.getColumn("item_name")?.getFilterValue() as string) ?? ""}
-            onValueChange={(value) =>
-              table.getColumn("item_name")?.setFilterValue(value)
-            }
-            placeholder="Filtrar por ítem..."
-            searchPlaceholder="Buscar ítems..."
-            emptyText="No se encontraron ítems."
-          />
-          <TableCombobox
-            options={filterOptions.municipalities}
-            value={(table.getColumn("municipality_name")?.getFilterValue() as string) ?? ""}
-            onValueChange={(value) =>
-              table.getColumn("municipality_name")?.setFilterValue(value)
-            }
-            placeholder="Filtrar por municipio..."
-            searchPlaceholder="Buscar municipios..."
-            emptyText="No se encontraron municipios."
-          />
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
+    <div className="space-y-3">
+      {/* Row 1: Search + Sort Button (mobile only) */}
+      <div className="flex gap-2">
+        <SmartSearch
+          value={search ?? ""}
+          onChange={(value) => onSearchChange(value || null)}
+          placeholder="Buscar item o codigo..."
+        />
+        {/* Mobile sort button */}
+        <Button
+          variant="outline"
+          size="icon"
+          className="tablet:hidden shrink-0"
+          onClick={() => setIsSortSheetOpen(true)}
+          aria-label="Ordenar resultados"
+        >
+          <ArrowUpDown className="size-4" />
+        </Button>
+      </div>
+
+      {/* Row 2: Municipality filter (collapsible on mobile, visible on tablet+) */}
+      <div className="tablet:hidden">
+        <Collapsible open={isMoreFiltersOpen} onOpenChange={setIsMoreFiltersOpen}>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="gap-1 -ml-2">
+              Mas filtros
+              <ChevronDown
+                className={`size-4 transition-transform ${isMoreFiltersOpen ? "rotate-180" : ""}`}
+              />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-2">
+            <TableCombobox
+              options={filterOptions.municipalities}
+              value={municipalityName ?? ""}
+              onValueChange={(value) => onMunicipalityChange(value || null)}
+              placeholder="Filtrar por municipio..."
+              searchPlaceholder="Buscar municipios..."
+              emptyText="No se encontraron municipios."
+            />
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+
+      {/* Tablet+: Always visible municipality filter */}
+      <div className="hidden tablet:block">
+        <TableCombobox
+          options={filterOptions.municipalities}
+          value={municipalityName ?? ""}
+          onValueChange={(value) => onMunicipalityChange(value || null)}
+          placeholder="Filtrar por municipio..."
+          searchPlaceholder="Buscar municipios..."
+          emptyText="No se encontraron municipios."
+        />
+      </div>
+
+      {/* Row 3: Filter chips */}
+      <FilterChips
+        search={search}
+        municipalityName={municipalityName}
+        sorting={sorting}
+        onClearSearch={() => onSearchChange(null)}
+        onClearMunicipality={() => onMunicipalityChange(null)}
+        onClearSort={() => onSortChange(null)}
+        onClearAll={onClearAll}
+      />
+
+      {/* Mobile sort sheet */}
+      <MobileSortSheet
+        currentSort={sorting}
+        onSortChange={onSortChange}
+        open={isSortSheetOpen}
+        onOpenChange={setIsSortSheetOpen}
+      />
+    </div>
   );
 }

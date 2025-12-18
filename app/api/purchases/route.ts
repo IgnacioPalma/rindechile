@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit;
 
     // Filtering parameters
-    const itemNameFilter = searchParams.get('itemName');
+    const searchQuery = searchParams.get('search'); // Unified search for item name or ChileCompra ID
     const municipalityNameFilter = searchParams.get('municipalityName');
 
     // Sorting parameters
@@ -78,10 +78,16 @@ export async function GET(request: NextRequest) {
       whereConditions.push(eq(municipalities.region_id, parseInt(regionId)));
     }
 
-    // Apply column filters
-    if (itemNameFilter) {
-      whereConditions.push(eq(items.name, itemNameFilter));
+    // Apply search filter (searches item name and ChileCompra ID)
+    if (searchQuery) {
+      whereConditions.push(
+        or(
+          like(items.name, `%${searchQuery}%`),
+          like(purchases.chilecompra_code, `%${searchQuery}%`)
+        )
+      );
     }
+    // Apply municipality filter
     if (municipalityNameFilter) {
       whereConditions.push(eq(municipalities.name, municipalityNameFilter));
     }

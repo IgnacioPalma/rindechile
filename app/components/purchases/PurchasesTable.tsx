@@ -25,7 +25,7 @@ export type ServerSortingState = {
 } | null;
 
 export type FilterState = {
-  itemName: string | null;
+  search: string | null;
   municipalityName: string | null;
 };
 
@@ -44,7 +44,7 @@ export function PurchasesTable() {
   });
   const [sorting, setSorting] = useState<ServerSortingState>(null);
   const [filters, setFilters] = useState<FilterState>({
-    itemName: null,
+    search: null,
     municipalityName: null,
   });
   const [loading, setLoading] = useState(true);
@@ -85,8 +85,8 @@ export function PurchasesTable() {
         }
 
         // Add filter parameters
-        if (filters.itemName) {
-          params.append('itemName', filters.itemName);
+        if (filters.search) {
+          params.append('search', filters.search);
         }
         if (filters.municipalityName) {
           params.append('municipalityName', filters.municipalityName);

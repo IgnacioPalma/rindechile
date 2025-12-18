@@ -6,6 +6,9 @@
 /scripts/*.json
 /scripts/sql/
 
+# Claude
+Claude.md
+
 # dependencies
 /node_modules
 /.pnp
